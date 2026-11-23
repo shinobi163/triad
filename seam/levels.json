@@ -1,0 +1,34 @@
+{
+  "levels": [
+    {
+      "id": "daily1",
+      "name": "The Gravity Anchor",
+      "difficulty": "standard",
+      "size": [3, 3],
+      "orbs": [
+        { "at": [0, 0], "tier": 1 },
+        { "at": [2, 0], "tier": 1 }
+      ],
+      "anchors": [[2, 0]],
+      "goals": [[2, 2]],
+      "par": 3,
+      "solution": ["R1", "SNIP", "C1"]
+    },
+    {
+      "id": "daily2",
+      "name": "Double Stitch",
+      "difficulty": "master",
+      "size": [5, 5],
+      "orbs": [
+        { "at": [0, 2], "tier": 1 },
+        { "at": [2, 2], "tier": 1 },
+        { "at": [4, 2], "tier": 1 },
+        { "at": [4, 4], "tier": 1 }
+      ],
+      "anchors": [[2, 2]],
+      "goals": [[2, 4], [4, 0]],
+      "par": 5,
+      "solution": ["R1", "SNIP", "C3", "SNIP", "C1"]
+    }
+  ]
+}

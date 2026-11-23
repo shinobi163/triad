@@ -1,0 +1,183 @@
+{
+  "daily1": {
+    "fixed": {
+      "TL": "CROSS",
+      "TR": "WOOD",
+      "CENTER": "HOUSE",
+      "BL": "SHOW",
+      "BR": "MAN"
+    },
+    "solution": {
+      "A": "FIRE",
+      "B": "ROAD",
+      "C": "WORK",
+      "D": "BOAT"
+    },
+    "bank": [
+      "FIRE",
+      "ROAD",
+      "WORK",
+      "BOAT"
+    ],
+    "decoy": null,
+    "solutionWords": [
+      "CROSSFIRE",
+      "FIREWOOD",
+      "FIREHOUSE",
+      "CROSSROAD",
+      "ROADHOUSE",
+      "ROADSHOW",
+      "WOODWORK",
+      "HOUSEWORK",
+      "WORKMAN",
+      "HOUSEBOAT",
+      "SHOWBOAT",
+      "BOATMAN"
+    ],
+    "validPairs": [
+      "BOATHOUSE",
+      "BOATMAN",
+      "CROSSFIRE",
+      "CROSSROAD",
+      "FIREHOUSE",
+      "FIREMAN",
+      "FIREWOOD",
+      "HOUSEBOAT",
+      "HOUSEWORK",
+      "ROADHOUSE",
+      "ROADSHOW",
+      "SHOWBOAT",
+      "WOODWORK",
+      "WORKHOUSE",
+      "WORKMAN"
+    ],
+    "trapPlacements": [
+      {
+        "word": "FIRE",
+        "slot": "B"
+      },
+      {
+        "word": "ROAD",
+        "slot": "A"
+      },
+      {
+        "word": "WORK",
+        "slot": "D"
+      },
+      {
+        "word": "BOAT",
+        "slot": "C"
+      }
+    ],
+    "dictionaryLinks": [
+      "https://www.merriam-webster.com/dictionary/crossfire",
+      "https://www.merriam-webster.com/dictionary/firewood",
+      "https://www.merriam-webster.com/dictionary/firehouse",
+      "https://www.merriam-webster.com/dictionary/crossroad",
+      "https://www.merriam-webster.com/dictionary/roadhouse",
+      "https://www.merriam-webster.com/dictionary/roadshow",
+      "https://www.merriam-webster.com/dictionary/woodwork",
+      "https://www.merriam-webster.com/dictionary/housework",
+      "https://www.merriam-webster.com/dictionary/workman",
+      "https://www.merriam-webster.com/dictionary/houseboat",
+      "https://www.merriam-webster.com/dictionary/showboat",
+      "https://www.merriam-webster.com/dictionary/boatman"
+    ]
+  },
+  "daily2": {
+    "fixed": {
+      "TL": "DOWN",
+      "TR": "GROUND",
+      "CENTER": "BACK",
+      "BL": "OUT",
+      "BR": "LINE"
+    },
+    "solution": {
+      "A": "PLAY",
+      "B": "FALL",
+      "C": "WATER",
+      "D": "SIDE"
+    },
+    "bank": [
+      "PLAY",
+      "FALL",
+      "WATER",
+      "SIDE",
+      "STORY"
+    ],
+    "decoy": "STORY",
+    "solutionWords": [
+      "DOWNPLAY",
+      "PLAYGROUND",
+      "PLAYBACK",
+      "DOWNFALL",
+      "FALLBACK",
+      "FALLOUT",
+      "GROUNDWATER",
+      "BACKWATER",
+      "WATERLINE",
+      "BACKSIDE",
+      "OUTSIDE",
+      "SIDELINE"
+    ],
+    "validPairs": [
+      "BACKSIDE",
+      "BACKSTORY",
+      "BACKWATER",
+      "DOWNFALL",
+      "DOWNPLAY",
+      "DOWNSIDE",
+      "FALLBACK",
+      "FALLOUT",
+      "GROUNDWATER",
+      "OUTFALL",
+      "OUTPLAY",
+      "OUTSIDE",
+      "PLAYBACK",
+      "PLAYGROUND",
+      "SIDELINE",
+      "STORYLINE",
+      "WATERLINE"
+    ],
+    "trapPlacements": [
+      {
+        "word": "PLAY",
+        "slot": "B"
+      },
+      {
+        "word": "FALL",
+        "slot": "A"
+      },
+      {
+        "word": "WATER",
+        "slot": "D"
+      },
+      {
+        "word": "SIDE",
+        "slot": "C"
+      },
+      {
+        "word": "STORY",
+        "slot": "C"
+      },
+      {
+        "word": "STORY",
+        "slot": "D"
+      }
+    ],
+    "dictionaryLinks": [
+      "https://www.merriam-webster.com/dictionary/downplay",
+      "https://www.merriam-webster.com/dictionary/playground",
+      "https://www.merriam-webster.com/dictionary/playback",
+      "https://www.merriam-webster.com/dictionary/downfall",
+      "https://www.merriam-webster.com/dictionary/fallback",
+      "https://www.merriam-webster.com/dictionary/fallout",
+      "https://www.merriam-webster.com/dictionary/groundwater",
+      "https://www.merriam-webster.com/dictionary/backwater",
+      "https://www.merriam-webster.com/dictionary/waterline",
+      "https://www.merriam-webster.com/dictionary/backside",
+      "https://www.merriam-webster.com/dictionary/outside",
+      "https://www.merriam-webster.com/dictionary/sideline"
+    ]
+  }
+}
