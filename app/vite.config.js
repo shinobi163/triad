@@ -3,6 +3,6 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
-  // puzzles.json lives next to the generator in ../crossfire
+  // Each game's rules engine and puzzles live in its own folder one level up.
   server: { fs: { allow: ['..'] } },
 });

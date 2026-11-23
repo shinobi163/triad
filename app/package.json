@@ -1,5 +1,5 @@
 {
-  "name": "triad",
+  "name": "wits",
   "private": true,
   "version": "0.1.0",
   "type": "module",
@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "puzzles": "node ../crossfire/generate.mjs --verify --json ../crossfire/puzzles.json"
+    "check": "node ../rungs/check.mjs && node ../lockpick/check.mjs && node ../reelgaps/check.mjs && node ../relay/check.mjs && node ../stowaway/check.mjs && node ../poise/check.mjs",
+    "words": "node ../words/lexicon.mjs"
   },
   "dependencies": {
     "react": "18.3.1",

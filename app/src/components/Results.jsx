@@ -11,7 +11,7 @@ export function Stat({ label, value }) {
 }
 
 export function StatRow({ children }) {
-  return <div className="grid grid-cols-4 gap-2 border-y border-black/10 py-4">{children}</div>;
+  return <div className="grid auto-cols-fr grid-flow-col gap-2 border-y border-black/10 py-4">{children}</div>;
 }
 
 async function copy(text) {
@@ -29,8 +29,8 @@ async function copy(text) {
   }
 }
 
-// Share + Next puzzle buttons, and the way back to all games.
-export function ResultActions({ shareText, onNext, onHome }) {
+// Share (+ an optional next step), and the way back to all games.
+export function ResultActions({ shareText, onNext, nextLabel = 'Next →', onHome }) {
   const [copied, setCopied] = useState(null);   // null | 'ok' | 'failed'
   const share = async () => {
     setCopied((await copy(shareText())) ? 'ok' : 'failed');
@@ -44,7 +44,7 @@ export function ResultActions({ shareText, onNext, onHome }) {
         </button>
         {onNext && (
           <button type="button" onClick={onNext} className="flex-1 rounded-full bg-ink py-3 font-bold text-white hover:bg-ink/85">
-            Next puzzle →
+            {nextLabel}
           </button>
         )}
       </div>

@@ -12,37 +12,3 @@ body {
 body {
   font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 }
-
-/* ---- Seam board ---- */
-.seam-board {
-  --gut: 1.9rem;
-  --thread: 14px;
-  /* n = largest side, set inline */
-  --cell: min(4.25rem, calc((min(100vw, 30rem) - 2rem - var(--gut) - var(--n) * 5px) / var(--n)));
-  display: grid;
-  gap: 5px;
-  transition: grid-template-rows 250ms ease, grid-template-columns 250ms ease;
-}
-/* Brass brackets in two corners mark an Anchor cell. */
-.seam-anchor::before,
-.seam-anchor::after {
-  content: '';
-  position: absolute;
-  width: 34%;
-  height: 34%;
-  border: 3px solid theme('colors.brass');
-  pointer-events: none;
-}
-.seam-anchor::before { top: 4px; left: 4px; border-right: 0; border-bottom: 0; border-top-left-radius: 4px; }
-.seam-anchor::after { bottom: 4px; right: 4px; border-left: 0; border-top: 0; border-bottom-right-radius: 4px; }
-
-@keyframes thread-glow {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(168, 117, 16, 0.45); }
-  50% { box-shadow: 0 0 0 5px rgba(168, 117, 16, 0); }
-}
-.seam-thread { animation: thread-glow 1.6s ease-in-out infinite; }
-
-@media (prefers-reduced-motion: reduce) {
-  .seam-board { transition: none; }
-  .seam-thread, .animate-pop, .animate-shake { animation: none; }
-}

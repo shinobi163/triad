@@ -14,14 +14,6 @@ export default {
         ok: '#4C9A5B',
         trap: '#D9A520',
         bad: '#C9473F',
-        // Seam papercraft palette (contrast-checked; see seam spec)
-        linen: '#F5EFEB',
-        cardstock: '#E5DCCE',
-        thread: '#A87510',
-        brass: '#8A6212',
-        amethyst: '#6C5CE7',
-        ruby: '#C7331A',
-        goal: '#2E7D57',
       },
       keyframes: {
         pop: { '0%': { transform: 'scale(1)' }, '50%': { transform: 'scale(1.08)' }, '100%': { transform: 'scale(1)' } },

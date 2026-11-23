@@ -1,0 +1,26 @@
+{
+  "theme": "Fruit",
+  "themeWords": ["APPLE", "APRICOT", "BANANA", "CHERRY", "DATE", "FIG", "GRAPE", "GUAVA", "KIWI", "LEMON", "LIME", "LYCHEE", "MANGO", "MELON", "OLIVE", "ORANGE", "PAPAYA", "PEACH", "PEAR", "PLUM", "QUINCE", "SLOE"],
+  "sentences": [
+    {
+      "text": "Please keep each receipt safe.",
+      "answer": "PEACH"
+    },
+    {
+      "text": "The camel I met was friendly.",
+      "answer": "LIME"
+    },
+    {
+      "text": "He swung the mop lumbering down the hall.",
+      "answer": "PLUM"
+    },
+    {
+      "text": "The hostile monkeys stole our lunch.",
+      "answer": "LEMON"
+    },
+    {
+      "text": "My dad ate the last cookie.",
+      "answer": "DATE"
+    }
+  ]
+}
