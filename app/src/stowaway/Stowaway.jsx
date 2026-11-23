@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import data from '../../../stowaway/puzzles.json';
 import { findHidden, picked } from '../../../stowaway/engine.mjs';
-import { GameFrame, HowTo, useGame, useHowTo } from '../components/GameFrame.jsx';
+import { GameFrame, GiveUp, HowTo, useGame, useHowTo } from '../components/GameFrame.jsx';
 import Modal from '../components/Modal.jsx';
 import { ResultActions, Stat, StatRow } from '../components/Results.jsx';
 import { formatTime } from '../format.js';
@@ -31,6 +31,8 @@ function reducer(state, action) {
     }
     case 'skip':
       return next(state, 'skipped');
+    case 'giveUp':
+      return { ...state, first: null, status: 'done', gaveUp: true };
     default:
       return state;
   }
@@ -40,7 +42,7 @@ const foundCount = (log) => log.filter((l) => l === 'found').length;
 
 export function stowawayResults() {
   const s = session.get(KEY);
-  return s?.status === 'done' ? [{ elapsed: s.elapsed, detail: `${foundCount(s.log)} of ${SENTENCES.length} found` }] : [];
+  return s?.status === 'done' ? [{ elapsed: s.elapsed, detail: `${foundCount(s.log)} of ${SENTENCES.length} found${s.gaveUp ? ' · gave up' : ''}` }] : [];
 }
 
 // The sentence with its stowaway marked, for the results card.
@@ -130,11 +132,14 @@ export default function Stowaway({ onHome }) {
           <button type="button" onClick={skip} className="mx-auto mt-auto block rounded-md px-4 py-2 text-sm font-semibold text-ink/60 hover:bg-black/5 hover:text-ink">
             Skip ›
           </button>
+          <div className="mt-2">
+            <GiveUp onGiveUp={() => { dispatch({ type: 'giveUp' }); setShowResults(true); }} />
+          </div>
         </>
       )}
 
       {showResults && (
-        <Modal title="All aboard" onClose={() => setShowResults(false)}>
+        <Modal title={state.gaveUp ? 'The stowaways' : 'All aboard'} onClose={() => setShowResults(false)}>
           <StatRow>
             <Stat label="Time" value={formatTime(state.elapsed)} />
             <Stat label="Found" value={`${foundCount(state.log)}/${SENTENCES.length}`} />

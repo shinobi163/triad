@@ -7,3 +7,4 @@ const setOf = (kind, n) => (cache[`${kind}${n}`] ??= new Set(data[kind][n] ? dat
 
 export const isWord = (w) => setOf('valid', w.length).has(w);
 export const commonWords = (n) => setOf('common', n);
+export const validWords = (n) => setOf('valid', n);

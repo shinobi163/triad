@@ -5,11 +5,12 @@ import { readFileSync } from 'node:fs';
 import { clueFor, isAnswer } from './engine.mjs';
 
 const MIN_CLUE = 4;
-const { seconds, titles } = JSON.parse(readFileSync(new URL('./puzzles.json', import.meta.url), 'utf8'));
+const { seconds, theme, titles } = JSON.parse(readFileSync(new URL('./puzzles.json', import.meta.url), 'utf8'));
 
 let failed = false;
 const seen = new Map();
-console.log(`${titles.length} titles, ${seconds}s on the clock`);
+console.log(`${theme}: ${titles.length} titles, ${seconds}s on the clock`);
+if (!theme) { console.log('  ✕ no theme'); failed = true; }
 for (const title of titles) {
   const clue = clueFor(title);
   const problems = [];

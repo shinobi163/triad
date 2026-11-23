@@ -86,3 +86,23 @@ export function useGame(key, reducer, init, { paused }) {
 
   return [state, dispatch];
 }
+
+// Ends the game and shows the answer. The first tap asks to be sure, so a
+// stray tap can't end a game.
+export function GiveUp({ onGiveUp }) {
+  const [armed, setArmed] = useState(false);
+  useEffect(() => {
+    if (!armed) return undefined;
+    const id = setTimeout(() => setArmed(false), 3000);
+    return () => clearTimeout(id);
+  }, [armed]);
+  return (
+    <button
+      type="button"
+      onClick={() => (armed ? onGiveUp() : setArmed(true))}
+      className={`mx-auto block rounded-md px-4 py-2 text-sm font-semibold hover:bg-black/5 ${armed ? 'text-bad' : 'text-ink/50 hover:text-ink'}`}
+    >
+      {armed ? 'Tap again to show the answer' : 'Give up'}
+    </button>
+  );
+}

@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import data from '../../../rungs/puzzles.json';
 import { shortestPath, stepError } from '../../../rungs/engine.mjs';
-import { GameFrame, HowTo, useGame, useHowTo } from '../components/GameFrame.jsx';
+import { GameFrame, GiveUp, HowTo, useGame, useHowTo } from '../components/GameFrame.jsx';
 import WordInput from '../components/WordInput.jsx';
 import Modal from '../components/Modal.jsx';
 import { ResultActions, Stat, StatRow } from '../components/Results.jsx';
-import { commonWords, isWord } from '../words.js';
+import { commonWords, isWord, validWords } from '../words.js';
 import { formatTime } from '../format.js';
 import { session } from '../session.js';
 
@@ -23,10 +23,21 @@ const ERRORS = {
 
 const fresh = () => ({ ladder: [PUZZLE.start], steps: 0, misses: 0, elapsed: 0, status: 'playing', error: null, shake: 0 });
 
+// The quickest way to the end from `word`, preferring common words. A ladder
+// can never become impossible: any step can be undone, so every word you
+// reach still links back to the start, and the start links to the end.
+const routeFrom = (word) => {
+  const n = word.length;
+  return shortestPath(word, PUZZLE.end, commonWords(n)) ?? shortestPath(word, PUZZLE.end, validWords(n));
+};
+
 // Every try is a step, valid or not; only valid words join the ladder.
+// Giving up stores the route from the current word in `gaveUp`.
 function reducer(state, action) {
   if (action.type === 'tick') return state.status === 'playing' ? { ...state, elapsed: state.elapsed + 1 } : state;
-  if (state.status !== 'playing' || action.type !== 'try') return state;
+  if (state.status !== 'playing') return state;
+  if (action.type === 'giveUp') return { ...state, status: 'done', gaveUp: routeFrom(state.ladder[state.ladder.length - 1]), error: null };
+  if (action.type !== 'try') return state;
   const prev = state.ladder[state.ladder.length - 1];
   const error = stepError(prev, action.word, isWord);
   if (error) return { ...state, steps: state.steps + 1, misses: state.misses + 1, error, shake: state.shake + 1 };
@@ -36,7 +47,7 @@ function reducer(state, action) {
 
 export function rungsResults() {
   const s = session.get(KEY);
-  return s?.status === 'done' ? [{ elapsed: s.elapsed, detail: `${s.steps} steps · par ${PUZZLE.par}` }] : [];
+  return s?.status === 'done' ? [{ elapsed: s.elapsed, detail: s.gaveUp ? 'Gave up' : `${s.steps} steps · par ${PUZZLE.par}` }] : [];
 }
 
 // One word as letter tiles; `changed` marks the letter that differs from the word above.
@@ -117,6 +128,9 @@ export default function Rungs({ onHome }) {
                 <p className="mt-2 h-5 text-center text-sm font-semibold text-bad" aria-live="polite">
                   {state.error && ERRORS[state.error]}
                 </p>
+                <div className="mt-6">
+                  <GiveUp onGiveUp={() => { dispatch({ type: 'giveUp' }); setShowResults(true); }} />
+                </div>
               </>
             )}
           </div>
@@ -124,17 +138,27 @@ export default function Rungs({ onHome }) {
       )}
 
       {showResults && (
-        <Modal title="You made it" onClose={() => setShowResults(false)}>
+        <Modal title={state.gaveUp ? 'The answer' : 'You made it'} onClose={() => setShowResults(false)}>
           <StatRow>
             <Stat label="Time" value={formatTime(state.elapsed)} />
             <Stat label="Steps" value={state.steps} />
             <Stat label="Par" value={PUZZLE.par} />
           </StatRow>
-          <p className="mt-4 text-xs font-bold uppercase tracking-wider text-ink/50">A shortest route</p>
+          {state.gaveUp && state.ladder.length > 1 && (
+            <>
+              <p className="mt-4 text-xs font-bold uppercase tracking-wider text-ink/50">
+                From where you stopped: {state.gaveUp.length - 1} more steps
+              </p>
+              <p className="mt-1 font-mono text-sm">{state.gaveUp.join(' → ')}</p>
+            </>
+          )}
+          <p className="mt-4 text-xs font-bold uppercase tracking-wider text-ink/50">A shortest route from the start</p>
           <p className="mt-1 font-mono text-sm">{PUZZLE.route.join(' → ')}</p>
           <ResultActions
             onHome={onHome}
-            shareText={() => `Wits · Rungs ${PUZZLE.start} → ${PUZZLE.end}\n${state.steps} steps (par ${PUZZLE.par}) · ⏱ ${formatTime(state.elapsed)}`}
+            shareText={() =>
+              `Wits · Rungs ${PUZZLE.start} → ${PUZZLE.end}\n${state.gaveUp ? 'Gave up' : `${state.steps} steps (par ${PUZZLE.par})`} · ⏱ ${formatTime(state.elapsed)}`
+            }
           />
         </Modal>
       )}

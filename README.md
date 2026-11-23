@@ -30,6 +30,7 @@ Open http://localhost:5173. Each game also has its own address (`#rungs`, `#lock
 
 - Every game opens on a How-to screen (three lines, one example, **Play**) the first time each visit; **?** brings it back.
 - **‹ Games** (top left) and **‹ Back to all games** (on every results card) return to the list at any time; the browser Back button works too. Leaving keeps the game as it was.
+- Every game has **Give up** (tap twice), which ends the game and shows the answer.
 - The list shows a ✓ line only for puzzles finished this visit.
 - Nothing is saved between visits: progress lives in memory (`app/src/session.js`).
 
@@ -43,17 +44,17 @@ npm run words    # rebuilds words/words.json after editing the word lists
 
 ## The games
 
-**Rungs.** Get from the start word to the end word, changing one letter per step. Every try counts as a step; an invalid word shakes. No undo. Par is the shortest route through common words.
+**Rungs.** Get from the start word to the end word, changing one letter per step. Every try counts as a step; an invalid word shakes. No undo. Par is the shortest route through common words. A ladder can't become impossible (any step can be undone, so every word you reach still links to the end); Give up shows the shortest route from where you stopped.
 
-**Lockpick.** Find the secret word. Each guess says whether the secret comes before or after it alphabetically. 4, 5 or 6 letters (Easy, Medium, Hard). Invalid or already-ruled-out guesses shake and don't count. Par is what perfect halving of the common words would take.
+**Lockpick.** Find the secret word. Each guess says whether the secret comes before or after it alphabetically. 4, 5 or 6 letters (Easy, Medium, Hard). Invalid or already-ruled-out guesses shake and don't count. A meter shows how close each guess is (Cold → Burning), measured in common words between the guess and the secret. Par is what perfect halving of the common words would take.
 
-**Reel Gaps.** 90 seconds. Each clue is a movie title with vowels (A E I O U) and spaces removed; Y stays. Answers ignore spaces, punctuation, capitals and a leading "The". Skip moves on.
+**Reel Gaps.** 90 seconds, 10 titles on one theme (today: Biopics). Each clue is a movie title with vowels (A E I O U) and spaces removed; Y stays. Answers ignore spaces, punctuation, capitals and a leading "The", "A" or "An". Skip moves on.
 
-**Relay.** 60 seconds. Each word must start with the last letter of the one before, fit the day's category, and not repeat. Pass hands over a fresh word when you're stuck (it doesn't score).
+**Relay.** 60 seconds. Each word must start with the last letter of the one before, be on the day's category list, and not repeat. A word one typo away from exactly one list word counts as that word (RACOON → RACCOON); plurals point you to the singular; every rejection says why. Hint shows a possible word's length and first letter, then its last letter. Pass hands over a fresh word when you're stuck (it doesn't score).
 
 **Stowaway.** Five sentences, each hiding a themed word across a word gap. Tap its first letter, then its last.
 
-**Poise.** A hanging mobile. Each side of the top beam has a category, and words only hang on their own side. A word weighs its letter count; each side pulls with letters × distance. Balance every beam.
+**Poise.** A hanging mobile. Each side of the top beam has a category, and words only hang on their own side. A word weighs its letter count; each side pulls with letters × distance, shown above each beam end once it's loaded (6×2=12). Balance every beam. The How-to shows a small balanced mobile.
 
 ## Word lists
 

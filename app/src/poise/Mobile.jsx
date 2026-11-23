@@ -1,6 +1,6 @@
 // The hanging mobile, drawn in SVG. Each beam tips by its torque imbalance and
 // turns green once balanced; words hang as tags sized by their letters.
-import { isBalanced, tilt } from '../../../poise/engine.mjs';
+import { isBalanced, slotIds, tilt } from '../../../poise/engine.mjs';
 
 // Drawing units (SVG px).
 const U = 40;          // one unit of arm length
@@ -58,6 +58,15 @@ function Hook({ slot, word, side, selected, onTap }) {
   );
 }
 
+// "6×3=18": letters hanging from a side × its distance = its pull. Shown once
+// everything under that side is hung, so players see the rule at work.
+function pullLabel(arm, weights) {
+  const slots = arm.beam ? slotIds(arm.beam) : [arm.slot];
+  if (slots.some((s) => weights[s] == null)) return null;
+  const hanging = slots.reduce((sum, s) => sum + weights[s], 0);
+  return `${hanging}×${arm.arm}=${hanging * arm.arm}`;
+}
+
 function Beam({ beam, weights, placed, ui, side, depth }) {
   const angle = tilt(beam, weights);
   const color = isBalanced(beam, weights) ? '#16A34A' : '#121212';
@@ -76,6 +85,7 @@ function Beam({ beam, weights, placed, ui, side, depth }) {
         const x = s === 'left' ? leftX : rightX;
         const arm = beam[s];
         const armSide = side ?? s;   // below the top beam, everything keeps its top-level side
+        const pull = pullLabel(arm, weights);
         return (
           <g key={s} transform={`translate(${x} 0)`}>
             {/* counter-rotate so hangers always hang straight down */}
@@ -83,6 +93,11 @@ function Beam({ beam, weights, placed, ui, side, depth }) {
               {depth === 0 && (
                 <text x={0} y={-14} textAnchor="middle" fontSize="12" fontWeight="800" letterSpacing="1.5" fill={SIDE_TINT[s]}>
                   {ui.categories[s].toUpperCase()}
+                </text>
+              )}
+              {pull && (
+                <text x={0} y={depth === 0 ? -32 : -12} textAnchor="middle" fontSize="15" fontWeight="700" fill={color} fontFamily="ui-monospace, monospace">
+                  {pull}
                 </text>
               )}
               <line x1={0} y1={0} x2={0} y2={STRING} stroke="#737373" strokeWidth={1.5} />
@@ -104,7 +119,7 @@ function Beam({ beam, weights, placed, ui, side, depth }) {
 export default function Mobile({ beam, weights, placed, ui }) {
   const e = extent(beam);
   const pad = 30;   // room for the swing
-  const top = 60;   // ceiling, hanger and category labels above the main pivot
+  const top = 76;   // ceiling, hanger, pulls and category labels above the main pivot
   return (
     <svg
       viewBox={`${e.minX - pad} ${-top} ${e.maxX - e.minX + pad * 2} ${top + e.maxY + pad}`}

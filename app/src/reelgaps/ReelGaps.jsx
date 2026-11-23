@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import data from '../../../reelgaps/puzzles.json';
 import { clueFor, isAnswer } from '../../../reelgaps/engine.mjs';
-import { GameFrame, HowTo, useGame, useHowTo } from '../components/GameFrame.jsx';
+import { GameFrame, GiveUp, HowTo, useGame, useHowTo } from '../components/GameFrame.jsx';
 import WordInput from '../components/WordInput.jsx';
 import Modal from '../components/Modal.jsx';
 import { ResultActions, Stat, StatRow } from '../components/Results.jsx';
@@ -32,6 +32,8 @@ function reducer(state, action) {
       return isAnswer(action.text, TITLES[state.index]) ? advance(state, true) : { ...state, shake: state.shake + 1 };
     case 'skip':
       return advance(state, false);
+    case 'giveUp':
+      return { ...state, status: 'done', gaveUp: true };
     default:
       return state;
   }
@@ -41,7 +43,7 @@ const solvedCount = (s) => s.log.filter((l) => l.solved).length;
 
 export function reelGapsResults() {
   const s = session.get(KEY);
-  return s?.status === 'done' ? [{ elapsed: s.elapsed, detail: `${solvedCount(s)} titles solved` }] : [];
+  return s?.status === 'done' ? [{ elapsed: s.elapsed, detail: `${solvedCount(s)} of ${TITLES.length} solved${s.gaveUp ? ' · gave up' : ''}` }] : [];
 }
 
 export default function ReelGaps({ onHome }) {
@@ -77,7 +79,7 @@ export default function ReelGaps({ onHome }) {
           playLabel={`Start · ${LIMIT} seconds`}
           lines={[
             <>Each clue is a movie title with its <b>vowels and spaces removed</b>. Y stays.</>,
-            <>Type the full title. Spaces and capitals don't matter.</>,
+            <>Today's {TITLES.length} titles are all <b>{data.theme.toLowerCase()}</b>. Type the full title; spaces and capitals don't matter.</>,
             <>Solve as many as you can in {LIMIT} seconds. Stuck? Skip.</>,
           ]}
           example={<p className="font-mono">THSCLNTWRK → THE SOCIAL NETWORK</p>}
@@ -91,7 +93,8 @@ export default function ReelGaps({ onHome }) {
         </div>
       ) : (
         <>
-          <p className="mt-6 text-center text-sm text-ink/70">
+          <p className="mt-6 text-center text-xs font-bold uppercase tracking-[0.2em] text-fire">Theme: {data.theme}</p>
+          <p className="mt-1 text-center text-sm text-ink/70">
             Solved <b className="font-mono text-ink">{solved}</b> · Title {state.index + 1} of {TITLES.length}
           </p>
           <p
@@ -105,29 +108,35 @@ export default function ReelGaps({ onHome }) {
             <button type="button" onClick={() => dispatch({ type: 'skip' })} className="mx-auto mt-3 block rounded-md px-4 py-2 text-sm font-semibold text-ink/60 hover:bg-black/5 hover:text-ink">
               Skip ›
             </button>
+            <div className="mt-6">
+              <GiveUp onGiveUp={() => dispatch({ type: 'giveUp' })} />
+            </div>
           </div>
         </>
       )}
 
       {showResults && (
-        <Modal title={state.elapsed >= LIMIT ? "Time's up" : 'All done'} onClose={() => setShowResults(false)}>
+        <Modal title={state.gaveUp ? 'The answers' : state.elapsed >= LIMIT ? "Time's up" : 'All done'} onClose={() => setShowResults(false)}>
           <StatRow>
-            <Stat label="Solved" value={solved} />
-            <Stat label="Skipped" value={state.log.length - solved} />
+            <Stat label="Solved" value={`${solved}/${TITLES.length}`} />
             <Stat label="Time" value={formatTime(state.elapsed)} />
           </StatRow>
+          {/* every title, including ones the clock or Give up cut off */}
           <ul className="mt-4 space-y-1 text-sm">
-            {state.log.map(({ title, solved: ok }) => (
-              <li key={title} className="flex gap-2">
-                <span className={ok ? 'text-ok' : 'text-bad'}>{ok ? '✓' : '✕'}</span>
-                <span className="font-mono text-ink/50">{clueFor(title)}</span>
-                <span className="ml-auto font-semibold">{title}</span>
-              </li>
-            ))}
+            {TITLES.map((title, i) => {
+              const ok = state.log[i]?.solved;
+              return (
+                <li key={title} className="flex gap-2">
+                  <span className={ok ? 'text-ok' : 'text-bad'}>{ok ? '✓' : '✕'}</span>
+                  <span className="font-mono text-ink/50">{clueFor(title)}</span>
+                  <span className="ml-auto text-right font-semibold">{title}</span>
+                </li>
+              );
+            })}
           </ul>
           <ResultActions
             onHome={onHome}
-            shareText={() => `Wits · Reel Gaps\n🎬 ${solved} solved in ${LIMIT}s\n${state.log.map((l) => (l.solved ? '🟩' : '⬜')).join('')}`}
+            shareText={() => `Wits · Reel Gaps (${data.theme})\n🎬 ${solved}/${TITLES.length} in ${LIMIT}s\n${TITLES.map((_, i) => (state.log[i]?.solved ? '🟩' : '⬜')).join('')}`}
           />
         </Modal>
       )}

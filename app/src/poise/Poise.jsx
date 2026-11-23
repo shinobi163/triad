@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import puzzle from '../../../poise/puzzles.json';
-import { beams, fits, isBalanced, sideOfSlots, slotIds, solved, tilt, torques, weightsOf } from '../../../poise/engine.mjs';
-import { GameFrame, HowTo, useGame, useHowTo } from '../components/GameFrame.jsx';
+import { beams, fits, isBalanced, sideOfSlots, slotIds, solve, solved, tilt, torques, weightsOf } from '../../../poise/engine.mjs';
+import { GameFrame, GiveUp, HowTo, useGame, useHowTo } from '../components/GameFrame.jsx';
 import Modal from '../components/Modal.jsx';
 import { ResultActions, Stat, StatRow } from '../components/Results.jsx';
 import Mobile, { SIDE_TINT } from './Mobile.jsx';
@@ -13,7 +13,15 @@ const SIDE = sideOfSlots(puzzle.beam);
 const WORDS = Object.keys(puzzle.bank).sort();   // alphabetical, so the order gives nothing away
 const PAR = SLOTS.length;
 const KEY = `poise-${WORDS.join('-')}-${JSON.stringify(puzzle.beam).replace(/\W/g, '')}`;
+const SOLUTION = solve(puzzle).solutions[0];
 const beamName = (id) => (id === 'main' ? 'Top beam' : 'Lower beam');
+
+// The How-to's picture: one beam, already balanced, pulls shown.
+const DEMO = {
+  categories: { left: 'Fruit', right: 'Colours' },
+  beam: { left: { arm: 2, slot: 'X' }, right: { arm: 3, slot: 'Y' } },
+  placed: { X: 'CHERRY', Y: 'BLUE' },
+};
 
 const fresh = () => ({ placed: Object.fromEntries(SLOTS.map((s) => [s, null])), moves: 0, elapsed: 0, status: 'playing', error: null, shake: 0 });
 
@@ -34,6 +42,8 @@ function reducer(state, action) {
       return { ...state, placed: { ...state.placed, [action.slot]: null }, error: null };
     case 'clear':
       return { ...fresh(), moves: state.moves, elapsed: state.elapsed };
+    case 'giveUp':
+      return { ...state, placed: { ...SOLUTION }, status: 'done', gaveUp: true, error: null };
     default:
       return state;
   }
@@ -41,7 +51,7 @@ function reducer(state, action) {
 
 export function poiseResults() {
   const s = session.get(KEY);
-  return s?.status === 'done' ? [{ elapsed: s.elapsed, detail: `${s.moves} placements · par ${PAR}` }] : [];
+  return s?.status === 'done' ? [{ elapsed: s.elapsed, detail: s.gaveUp ? 'Gave up' : `${s.moves} placements · par ${PAR}` }] : [];
 }
 
 // One line above the mobile that explains whatever the player just caused.
@@ -94,11 +104,20 @@ export default function Poise({ onHome }) {
         <HowTo
           onPlay={() => setHowTo(false)}
           lines={[
-            <>Tap a word, then a hook. Words only hang on the side with their <b>category</b>.</>,
-            <>A word weighs its <b>letters</b>. Each side pulls with letters × distance (count the ticks).</>,
-            <>Balance every beam so it turns green. Not every word is needed.</>,
+            <>Tap a word, then a hook. Each side of the top beam has a <b>category</b>, and words only hang on their own side.</>,
+            <>A word weighs its <b>letters</b>. A side pulls with <b>letters × distance</b>; count the ticks for distance.</>,
+            <>When both sides pull the same, the beam turns <b className="text-[#16A34A]">green</b>. Balance them all. Some words are spares.</>,
           ]}
-          example={<p>CHERRY (6 letters) at distance 2 balances PLUM (4 letters) at distance 3, because 6 × 2 = 4 × 3.</p>}
+          example={
+            <>
+              <Mobile beam={DEMO.beam} weights={weightsOf(DEMO.placed)} placed={DEMO.placed} ui={{ categories: DEMO.categories, onTapSlot: () => {} }} />
+              <p className="mt-1 text-center">
+                CHERRY has 6 letters, 2 ticks out: 6 × 2 = 12.
+                <br />
+                BLUE has 4 letters, 3 ticks out: 4 × 3 = 12. Balanced.
+              </p>
+            </>
+          }
         />
       ) : (
         <>
@@ -151,11 +170,16 @@ export default function Poise({ onHome }) {
               </button>
             )}
           </div>
+          {!done && (
+            <div className="mt-3">
+              <GiveUp onGiveUp={() => { dispatch({ type: 'giveUp' }); setSelected(null); setTimeout(() => setShowResults(true), 900); }} />
+            </div>
+          )}
         </>
       )}
 
       {showResults && (
-        <Modal title="Perfect balance" onClose={() => setShowResults(false)}>
+        <Modal title={state.gaveUp ? 'The answer' : 'Perfect balance'} onClose={() => setShowResults(false)}>
           <StatRow>
             <Stat label="Time" value={formatTime(state.elapsed)} />
             <Stat label="Placed" value={state.moves} />
@@ -179,7 +203,7 @@ export default function Poise({ onHome }) {
           </p>
           <ResultActions
             onHome={onHome}
-            shareText={() => `Wits · Poise\n⚖️ ${state.moves} placements (par ${PAR}) · ⏱ ${formatTime(state.elapsed)}`}
+            shareText={() => `Wits · Poise\n⚖️ ${state.gaveUp ? 'Gave up' : `${state.moves} placements (par ${PAR})`} · ⏱ ${formatTime(state.elapsed)}`}
           />
         </Modal>
       )}

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import data from '../../../lockpick/puzzles.json';
-import { bounds, clue, idealGuesses, ruledOut } from '../../../lockpick/engine.mjs';
-import { GameFrame, HowTo, useGame, useHowTo } from '../components/GameFrame.jsx';
+import { bounds, clue, heat, heatLabel, idealGuesses, ruledOut, wordsBetween } from '../../../lockpick/engine.mjs';
+import { GameFrame, GiveUp, HowTo, useGame, useHowTo } from '../components/GameFrame.jsx';
 import WordInput from '../components/WordInput.jsx';
 import Modal from '../components/Modal.jsx';
 import { ResultActions, Stat, StatRow } from '../components/Results.jsx';
@@ -13,7 +13,8 @@ const LENGTHS = [4, 5, 6];
 const PUZZLES = Object.fromEntries(
   LENGTHS.map((n) => {
     const secret = data.secrets[n];
-    return [n, { n, secret, par: idealGuesses([...commonWords(n)].sort(), secret), key: `lockpick-${n}-${secret}` }];
+    const sorted = [...commonWords(n)].sort();   // distances on the meter count these
+    return [n, { n, secret, sorted, par: idealGuesses(sorted, secret), key: `lockpick-${n}-${secret}` }];
   }),
 );
 const LENGTH_KEY = 'lockpick-length';
@@ -25,7 +26,9 @@ const fresh = () => ({ guesses: [], elapsed: 0, status: 'playing', error: null, 
 // Only real, still-possible words count as guesses; anything else just shakes.
 const reducerFor = (p) => (state, action) => {
   if (action.type === 'tick') return state.status === 'playing' ? { ...state, elapsed: state.elapsed + 1 } : state;
-  if (state.status !== 'playing' || action.type !== 'guess') return state;
+  if (state.status !== 'playing') return state;
+  if (action.type === 'giveUp') return { ...state, status: 'done', gaveUp: true, error: null };
+  if (action.type !== 'guess') return state;
   const { word } = action;
   const error = word.length !== p.n || !isWord(word) ? 'word' : ruledOut(word, bounds(state.guesses, p.secret)) ? 'ruled' : null;
   if (error) return { ...state, error, shake: state.shake + 1 };
@@ -35,7 +38,8 @@ const reducerFor = (p) => (state, action) => {
 export function lockpickResults() {
   return LENGTHS.flatMap((n) => {
     const s = session.get(PUZZLES[n].key);
-    return s?.status === 'done' ? [{ label: `${n} letters`, elapsed: s.elapsed, detail: `${s.guesses.length} guesses · par ${PUZZLES[n].par}` }] : [];
+    if (s?.status !== 'done') return [];
+    return [{ label: `${n} letters`, elapsed: s.elapsed, detail: s.gaveUp ? 'Gave up' : `${s.guesses.length} guesses · par ${PUZZLES[n].par}` }];
   });
 }
 
@@ -62,23 +66,51 @@ function LengthPicker({ value, onChange }) {
   );
 }
 
-// Guesses in alphabetical order with the secret's gap between them.
-function Ladder({ guesses, secret, n, done }) {
+// One colour per band, cold blue to burning red.
+const BAND_COLOR = { Cold: '#2563EB', Cool: '#0891B2', Warm: '#D97706', Hot: '#EA580C', Burning: '#DC2626' };
+const heatColor = (between) => BAND_COLOR[heatLabel(between)];
+
+// How close the latest guess was, as a bar and a word.
+function Meter({ p, guess }) {
+  const between = wordsBetween(guess, p.secret, p.sorted);
+  const h = heat(between, p.sorted.length);
+  return (
+    <div className="mt-4" aria-live="polite">
+      <div className="flex items-baseline justify-between text-sm">
+        <span className="font-mono font-bold tracking-widest">{guess}</span>
+        <span className="font-bold" style={{ color: heatColor(between) }}>{heatLabel(between)}</span>
+      </div>
+      <div className="mt-1 h-2.5 overflow-hidden rounded-full bg-black/10" role="meter" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(h * 100)} aria-label="How close">
+        <div className="h-full rounded-full transition-all duration-500" style={{ width: `${Math.max(4, h * 100)}%`, background: heatColor(between) }} />
+      </div>
+      <p className="mt-1 text-right text-xs text-ink/50">
+        {between === 0 ? 'Right next to it' : between === 1 ? 'One word away' : `About ${between.toLocaleString()} words away`}
+      </p>
+    </div>
+  );
+}
+
+// Guesses in alphabetical order with the secret's gap between them; each
+// guess keeps a dot showing how close it was.
+function Ladder({ p, guesses, done }) {
   const sorted = [...guesses].sort();
-  const above = sorted.filter((g) => clue(g, secret) === 'after');
-  const below = sorted.filter((g) => clue(g, secret) === 'before');
+  const above = sorted.filter((g) => clue(g, p.secret) === 'after');
+  const below = sorted.filter((g) => clue(g, p.secret) === 'before');
   const row = (w, near) => (
-    <li key={w} className={`text-center font-mono text-lg tracking-[0.3em] ${near ? 'font-bold text-ink' : 'text-ink/35'}`}>{w}</li>
+    <li key={w} className={`flex items-center justify-center gap-3 font-mono text-lg tracking-[0.3em] ${near ? 'font-bold text-ink' : 'text-ink/35'}`}>
+      <span className="h-2 w-2 flex-none rounded-full" style={{ background: heatColor(wordsBetween(w, p.secret, p.sorted)) }} aria-hidden="true" />
+      {w}
+    </li>
   );
   return (
     <ol className="space-y-1" aria-label="Guesses in alphabetical order">
       {above.length === 0 && <li className="text-center text-xs uppercase tracking-widest text-ink/35">A</li>}
       {above.map((w, i) => row(w, i === above.length - 1))}
       <li
-        className={`my-2 rounded-xl py-3 text-center font-mono text-2xl font-bold tracking-[0.4em] ${done ? 'bg-ok text-white' : 'bg-ink text-white'}`}
-        aria-label={done ? `Solved: ${secret}` : 'The secret word is here'}
+        className={`my-2 rounded-xl py-3 text-center font-mono text-2xl font-bold tracking-[0.4em] text-white ${done ? 'bg-ok' : 'bg-ink'}`}
+        aria-label={done ? `The word: ${p.secret}` : 'The secret word is here'}
       >
-        {done ? secret : '?'.repeat(n)}
+        {done ? p.secret : '?'.repeat(p.n)}
       </li>
       {below.map((w, i) => row(w, i === 0))}
       {below.length === 0 && <li className="text-center text-xs uppercase tracking-widest text-ink/35">Z</li>}
@@ -120,13 +152,15 @@ function Board({ p, howTo, setHowTo, onHome, children }) {
           lines={[
             <>Find the secret word.</>,
             <>Each guess tells you if the secret comes <b>before</b> or <b>after</b> it in the dictionary.</>,
-            <>Close the gap and pick the lock in as few guesses as you can.</>,
+            <>The meter shows how close you are, from <b style={{ color: BAND_COLOR.Cold }}>Cold</b> to <b style={{ color: BAND_COLOR.Burning }}>Burning</b>. Pick the lock in as few guesses as you can.</>,
           ]}
           example={
             <p className="font-mono">
               MOUSE → after · TABLE → before
               <br />
               The word is between MOUSE and TABLE.
+              <br />
+              PRINT → before · Warm
             </p>
           }
         >
@@ -138,8 +172,9 @@ function Board({ p, howTo, setHowTo, onHome, children }) {
             {p.n}-letter word · Guess <b className="font-mono text-ink">{state.guesses.length}</b> · Par {p.par}
           </p>
           <div className="mt-4">
-            <Ladder guesses={state.guesses} secret={p.secret} n={p.n} done={done} />
+            <Ladder p={p} guesses={state.guesses} done={done} />
           </div>
+          {!done && state.guesses.length > 0 && <Meter p={p} guess={state.guesses[state.guesses.length - 1]} />}
           <div className="mt-6">
             {done ? (
               <button type="button" onClick={() => setShowResults(true)} className="w-full rounded-full bg-ink py-3 font-bold text-white">
@@ -151,6 +186,9 @@ function Board({ p, howTo, setHowTo, onHome, children }) {
                 <p className="mt-2 h-5 text-center text-sm font-semibold text-bad" aria-live="polite">
                   {state.error && ERRORS[state.error]}
                 </p>
+                <div className="mt-4">
+                  <GiveUp onGiveUp={() => { dispatch({ type: 'giveUp' }); setShowResults(true); }} />
+                </div>
               </>
             )}
           </div>
@@ -158,7 +196,7 @@ function Board({ p, howTo, setHowTo, onHome, children }) {
       )}
 
       {showResults && (
-        <Modal title="Lock picked" onClose={() => setShowResults(false)}>
+        <Modal title={state.gaveUp ? 'The word was' : 'Lock picked'} onClose={() => setShowResults(false)}>
           <p className="-mt-2 mb-4 font-mono text-2xl font-bold tracking-[0.3em]">{p.secret}</p>
           <StatRow>
             <Stat label="Time" value={formatTime(state.elapsed)} />
@@ -167,7 +205,9 @@ function Board({ p, howTo, setHowTo, onHome, children }) {
           </StatRow>
           <ResultActions
             onHome={onHome}
-            shareText={() => `Wits · Lockpick (${p.n} letters)\n${state.guesses.length} guesses (par ${p.par}) · ⏱ ${formatTime(state.elapsed)}`}
+            shareText={() =>
+              `Wits · Lockpick (${p.n} letters)\n${state.gaveUp ? 'Gave up' : `${state.guesses.length} guesses (par ${p.par})`} · ⏱ ${formatTime(state.elapsed)}`
+            }
           />
         </Modal>
       )}

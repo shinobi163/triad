@@ -6,6 +6,6 @@ const lettersOf = (s) => s.toUpperCase().replace(/&/g, 'AND').replace(/[^A-Z0-9]
 // "The Social Network" -> "THSCLNTWRK"
 export const clueFor = (title) => lettersOf(title).replace(/[AEIOU]/g, '');
 
-// Answers ignore spaces, punctuation, capitals and a leading "The".
-const comparable = (s) => lettersOf(s.trim().replace(/^the\s+/i, ''));
+// Answers ignore spaces, punctuation, capitals and a leading "The", "A" or "An".
+const comparable = (s) => lettersOf(s.trim().replace(/^(the|an?)\s+/i, ''));
 export const isAnswer = (guess, title) => comparable(guess) === comparable(title);

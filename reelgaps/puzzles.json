@@ -1,25 +1,16 @@
 {
   "seconds": 90,
+  "theme": "Biopics",
   "titles": [
-    "Interstellar",
     "The Social Network",
-    "Jurassic Park",
-    "Finding Nemo",
-    "The Godfather",
-    "Back to the Future",
-    "Pulp Fiction",
-    "Forrest Gump",
-    "The Lion King",
-    "Black Panther",
-    "Toy Story",
-    "Home Alone",
-    "The Dark Knight",
-    "Mean Girls",
-    "Gladiator",
-    "Titanic",
-    "Inception",
-    "The Matrix",
-    "Casablanca",
-    "Goodfellas"
+    "Bohemian Rhapsody",
+    "Oppenheimer",
+    "The Imitation Game",
+    "Rocketman",
+    "A Beautiful Mind",
+    "Walk the Line",
+    "The Theory of Everything",
+    "Catch Me If You Can",
+    "Moneyball"
   ]
 }
