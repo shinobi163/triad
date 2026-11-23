@@ -2,6 +2,8 @@
 
 Six daily word games. React + Vite + Tailwind.
 
+**Play it:** https://shinobi163.github.io/triad/ (rebuilt and republished on every push to `main`; the deploy fails if any puzzle checker fails).
+
 ```
 app/        the playable app: opening screen + every game
 words/      the shared word list (ENABLE + common words + blocklist)
