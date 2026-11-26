@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import puzzle from '../../../poise/puzzles.json';
+import data from '../../../poise/puzzles.json';
 import { beams, fits, isBalanced, sideOfSlots, slotIds, solve, solved, tilt, torques, weightsOf } from '../../../poise/engine.mjs';
 import { GameFrame, GiveUp, HowTo, useGame, useHowTo } from '../components/GameFrame.jsx';
 import Modal from '../components/Modal.jsx';
@@ -7,13 +7,27 @@ import { ResultActions, Stat, StatRow } from '../components/Results.jsx';
 import Mobile, { SIDE_TINT } from './Mobile.jsx';
 import { formatTime } from '../format.js';
 import { session } from '../session.js';
+import { pick } from '../daily.js';
 
-const SLOTS = slotIds(puzzle.beam);
-const SIDE = sideOfSlots(puzzle.beam);
-const WORDS = Object.keys(puzzle.bank).sort();   // alphabetical, so the order gives nothing away
-const PAR = SLOTS.length;
-const KEY = `poise-${WORDS.join('-')}-${JSON.stringify(puzzle.beam).replace(/\W/g, '')}`;
-const SOLUTION = solve(puzzle).solutions[0];
+// Day n's level, with everything the screen derives from it worked out once.
+const cache = new Map();
+function levelFor(day) {
+  if (!cache.has(day)) {
+    const puzzle = pick(data.days, day);
+    const SLOTS = slotIds(puzzle.beam);
+    const WORDS = Object.keys(puzzle.bank).sort();   // alphabetical, so the order gives nothing away
+    cache.set(day, {
+      puzzle,
+      SLOTS,
+      SIDE: sideOfSlots(puzzle.beam),
+      WORDS,
+      PAR: SLOTS.length,
+      KEY: `poise-${day}-${WORDS.join('-')}`,
+      SOLUTION: solve(puzzle).solutions[0],
+    });
+  }
+  return cache.get(day);
+}
 const beamName = (id) => (id === 'main' ? 'Top beam' : 'Lower beam');
 
 // The How-to's picture: one beam, already balanced, pulls shown.
@@ -23,10 +37,12 @@ const DEMO = {
   placed: { X: 'CHERRY', Y: 'BLUE' },
 };
 
-const fresh = () => ({ placed: Object.fromEntries(SLOTS.map((s) => [s, null])), moves: 0, elapsed: 0, status: 'playing', error: null, shake: 0 });
+const freshFor = ({ SLOTS }) => () => ({ placed: Object.fromEntries(SLOTS.map((s) => [s, null])), moves: 0, elapsed: 0, status: 'playing', error: null, shake: 0 });
 
 // Every placement counts as a move; a word on the wrong side just shakes.
-function reducer(state, action) {
+const reducerFor = (L) => (state, action) => {
+  const { puzzle, SLOTS, SOLUTION } = L;
+  const fresh = freshFor(L);
   if (action.type === 'tick') return state.status === 'playing' ? { ...state, elapsed: state.elapsed + 1 } : state;
   if (state.status !== 'playing') return state;
   switch (action.type) {
@@ -47,15 +63,16 @@ function reducer(state, action) {
     default:
       return state;
   }
-}
+};
 
-export function poiseResults() {
+export function poiseResults(day) {
+  const { KEY, PAR } = levelFor(day);
   const s = session.get(KEY);
   return s?.status === 'done' ? [{ elapsed: s.elapsed, detail: s.gaveUp ? 'Gave up' : `${s.moves} placements · par ${PAR}` }] : [];
 }
 
 // One line above the mobile that explains whatever the player just caused.
-function instruction(state, weights) {
+function instruction({ puzzle, SLOTS, SIDE }, state, weights) {
   if (state.status === 'done') return 'Perfect balance.';
   if (state.error) return `${state.error.word} isn't ${puzzle.categories[SIDE[state.error.slot]].toLowerCase()}. It belongs on the other side.`;
   if (SLOTS.every((s) => state.placed[s] == null)) return 'Hang a word on every hook so each beam balances.';
@@ -67,9 +84,11 @@ function instruction(state, weights) {
   return 'Each side pulls with letters × distance. Count the ticks for distance.';
 }
 
-export default function Poise({ onHome }) {
+export default function Poise({ day, onHome }) {
+  const L = levelFor(day);
+  const { puzzle, SLOTS, SIDE, WORDS, PAR, KEY } = L;
   const [howTo, setHowTo] = useHowTo('poise');
-  const [state, dispatch] = useGame(KEY, reducer, fresh, { paused: howTo });
+  const [state, dispatch] = useGame(KEY, reducerFor(L), freshFor(L), { paused: howTo });
   const [selected, setSelected] = useState(null);   // { word } or { slot }
   const [showResults, setShowResults] = useState(false);
   const done = state.status === 'done';
@@ -122,7 +141,7 @@ export default function Poise({ onHome }) {
       ) : (
         <>
           <p className="mx-auto mt-5 min-h-[3rem] max-w-sm text-center text-[0.95rem] text-ink/80" aria-live="polite">
-            {instruction(state, weights)}
+            {instruction(L, state, weights)}
           </p>
 
           <div key={state.shake} className={state.shake ? 'animate-shake' : ''}>
@@ -203,7 +222,7 @@ export default function Poise({ onHome }) {
           </p>
           <ResultActions
             onHome={onHome}
-            shareText={() => `Wits · Poise\n⚖️ ${state.gaveUp ? 'Gave up' : `${state.moves} placements (par ${PAR})`} · ⏱ ${formatTime(state.elapsed)}`}
+            shareText={() => `Wits #${day} · Poise\n⚖️ ${state.gaveUp ? 'Gave up' : `${state.moves} placements (par ${PAR})`} · ⏱ ${formatTime(state.elapsed)}`}
           />
         </Modal>
       )}

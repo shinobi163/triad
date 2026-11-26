@@ -6,19 +6,28 @@ import Modal from '../components/Modal.jsx';
 import { ResultActions, Stat, StatRow } from '../components/Results.jsx';
 import { formatTime } from '../format.js';
 import { session } from '../session.js';
+import { pick } from '../daily.js';
 
-const SENTENCES = data.sentences.map((s) => ({ ...s, hit: findHidden(s.text, s.answer).hit }));
-const KEY = `stowaway-${data.theme}-${SENTENCES.map((s) => s.answer).join('-')}`;
+// Day n's theme and sentences, each with where its stowaway hides.
+const cache = new Map();
+function dayOf(day) {
+  if (!cache.has(day)) {
+    const { theme, sentences } = pick(data.days, day);
+    const SENTENCES = sentences.map((s) => ({ ...s, hit: findHidden(s.text, s.answer).hit }));
+    cache.set(day, { theme, SENTENCES, KEY: `stowaway-${day}-${theme}` });
+  }
+  return cache.get(day);
+}
 
 // log: 'found' | 'skipped' per sentence done; `first` is the first letter tapped.
 const fresh = () => ({ index: 0, log: [], misses: 0, first: null, elapsed: 0, status: 'playing', shake: 0 });
 
-const next = (state, outcome) => {
+const next = (SENTENCES, state, outcome) => {
   const log = [...state.log, outcome];
   return { ...state, log, first: null, index: state.index + 1, status: log.length >= SENTENCES.length ? 'done' : 'playing' };
 };
 
-function reducer(state, action) {
+const reducerFor = ({ SENTENCES }) => (state, action) => {
   if (action.type === 'tick') return state.status === 'playing' ? { ...state, elapsed: state.elapsed + 1 } : state;
   if (state.status !== 'playing') return state;
   const s = SENTENCES[state.index];
@@ -26,21 +35,22 @@ function reducer(state, action) {
     case 'tap': {
       if (state.first === null) return { ...state, first: action.at };
       if (state.first === action.at) return { ...state, first: null };
-      if (picked(s.text, state.first, action.at) === s.answer) return next(state, 'found');
+      if (picked(s.text, state.first, action.at) === s.answer) return next(SENTENCES, state, 'found');
       return { ...state, first: null, misses: state.misses + 1, shake: state.shake + 1 };
     }
     case 'skip':
-      return next(state, 'skipped');
+      return next(SENTENCES, state, 'skipped');
     case 'giveUp':
       return { ...state, first: null, status: 'done', gaveUp: true };
     default:
       return state;
   }
-}
+};
 
 const foundCount = (log) => log.filter((l) => l === 'found').length;
 
-export function stowawayResults() {
+export function stowawayResults(day) {
+  const { KEY, SENTENCES } = dayOf(day);
   const s = session.get(KEY);
   return s?.status === 'done' ? [{ elapsed: s.elapsed, detail: `${foundCount(s.log)} of ${SENTENCES.length} found${s.gaveUp ? ' · gave up' : ''}` }] : [];
 }
@@ -57,9 +67,11 @@ function Revealed({ s }) {
   );
 }
 
-export default function Stowaway({ onHome }) {
+export default function Stowaway({ day, onHome }) {
+  const D = dayOf(day);
+  const { SENTENCES, theme } = D;
   const [howTo, setHowTo] = useHowTo('stowaway');
-  const [state, dispatch] = useGame(KEY, reducer, fresh, { paused: howTo });
+  const [state, dispatch] = useGame(D.KEY, reducerFor(D), fresh, { paused: howTo });
   const [showResults, setShowResults] = useState(false);
   const done = state.status === 'done';
   const s = SENTENCES[state.index];
@@ -80,7 +92,7 @@ export default function Stowaway({ onHome }) {
         <HowTo
           onPlay={() => setHowTo(false)}
           lines={[
-            <>Each sentence hides one <b>{data.theme.toLowerCase()}</b>, running across the gap between words.</>,
+            <>Each sentence hides one <b>{theme.toLowerCase()}</b>, running across the gap between words.</>,
             <>Tap its <b>first letter</b>, then its <b>last letter</b>.</>,
             <>Find all {SENTENCES.length} as fast as you can.</>,
           ]}
@@ -100,7 +112,7 @@ export default function Stowaway({ onHome }) {
       ) : (
         <>
           <p className="mt-6 text-center text-sm text-ink/70">
-            Find the <b className="text-ink">{data.theme.toLowerCase()}</b> · {state.index + 1} of {SENTENCES.length}
+            Find the <b className="text-ink">{theme.toLowerCase()}</b> · {state.index + 1} of {SENTENCES.length}
           </p>
           <p
             key={state.index}
@@ -155,7 +167,7 @@ export default function Stowaway({ onHome }) {
           </ul>
           <ResultActions
             onHome={onHome}
-            shareText={() => `Wits · Stowaway (${data.theme})\n${state.log.map((l) => (l === 'found' ? '🟩' : '⬜')).join('')} · ⏱ ${formatTime(state.elapsed)}`}
+            shareText={() => `Wits #${day} · Stowaway (${theme})\n${state.log.map((l) => (l === 'found' ? '🟩' : '⬜')).join('')} · ⏱ ${formatTime(state.elapsed)}`}
           />
         </Modal>
       )}

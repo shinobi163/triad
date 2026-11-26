@@ -8,46 +8,54 @@ import { ResultActions, Stat, StatRow } from '../components/Results.jsx';
 import { commonWords, isWord, validWords } from '../words.js';
 import { formatTime } from '../format.js';
 import { session } from '../session.js';
+import { pick } from '../daily.js';
 
-const raw = data.puzzles[0];
-const route = shortestPath(raw.start, raw.end, commonWords(raw.start.length));
-export const PUZZLE = { ...raw, par: route.length - 1, route };
-const KEY = `rungs-${PUZZLE.id}-${PUZZLE.start}-${PUZZLE.end}`;
+// Day n's ladder, with par and one shortest route worked out once.
+const cache = new Map();
+function puzzleFor(day) {
+  const raw = pick(data.days, day);
+  if (!cache.has(raw)) {
+    const route = shortestPath(raw.start, raw.end, commonWords(raw.start.length));
+    cache.set(raw, { ...raw, par: route.length - 1, route, key: `rungs-${day}-${raw.start}-${raw.end}` });
+  }
+  return cache.get(raw);
+}
 
 const ERRORS = {
-  length: `Use ${PUZZLE.start.length} letters.`,
-  same: 'Change one letter.',
-  letters: 'Change only one letter.',
-  word: 'Not in the word list.',
+  length: (p) => `Use ${p.start.length} letters.`,
+  same: () => 'Change one letter.',
+  letters: () => 'Change only one letter.',
+  word: () => 'Not in the word list.',
 };
 
-const fresh = () => ({ ladder: [PUZZLE.start], steps: 0, misses: 0, elapsed: 0, status: 'playing', error: null, shake: 0 });
+const freshFor = (p) => () => ({ ladder: [p.start], steps: 0, misses: 0, elapsed: 0, status: 'playing', error: null, shake: 0 });
 
 // The quickest way to the end from `word`, preferring common words. A ladder
 // can never become impossible: any step can be undone, so every word you
 // reach still links back to the start, and the start links to the end.
-const routeFrom = (word) => {
+const routeFrom = (p, word) => {
   const n = word.length;
-  return shortestPath(word, PUZZLE.end, commonWords(n)) ?? shortestPath(word, PUZZLE.end, validWords(n));
+  return shortestPath(word, p.end, commonWords(n)) ?? shortestPath(word, p.end, validWords(n));
 };
 
 // Every try is a step, valid or not; only valid words join the ladder.
 // Giving up stores the route from the current word in `gaveUp`.
-function reducer(state, action) {
+const reducerFor = (p) => (state, action) => {
   if (action.type === 'tick') return state.status === 'playing' ? { ...state, elapsed: state.elapsed + 1 } : state;
   if (state.status !== 'playing') return state;
-  if (action.type === 'giveUp') return { ...state, status: 'done', gaveUp: routeFrom(state.ladder[state.ladder.length - 1]), error: null };
+  if (action.type === 'giveUp') return { ...state, status: 'done', gaveUp: routeFrom(p, state.ladder[state.ladder.length - 1]), error: null };
   if (action.type !== 'try') return state;
   const prev = state.ladder[state.ladder.length - 1];
   const error = stepError(prev, action.word, isWord);
   if (error) return { ...state, steps: state.steps + 1, misses: state.misses + 1, error, shake: state.shake + 1 };
   const ladder = [...state.ladder, action.word];
-  return { ...state, ladder, steps: state.steps + 1, error: null, status: action.word === PUZZLE.end ? 'done' : 'playing' };
-}
+  return { ...state, ladder, steps: state.steps + 1, error: null, status: action.word === p.end ? 'done' : 'playing' };
+};
 
-export function rungsResults() {
-  const s = session.get(KEY);
-  return s?.status === 'done' ? [{ elapsed: s.elapsed, detail: s.gaveUp ? 'Gave up' : `${s.steps} steps · par ${PUZZLE.par}` }] : [];
+export function rungsResults(day) {
+  const p = puzzleFor(day);
+  const s = session.get(p.key);
+  return s?.status === 'done' ? [{ elapsed: s.elapsed, detail: s.gaveUp ? 'Gave up' : `${s.steps} steps · par ${p.par}` }] : [];
 }
 
 // One word as letter tiles; `changed` marks the letter that differs from the word above.
@@ -74,9 +82,10 @@ function Rung({ word, changed, tone = 'normal' }) {
 
 const diffAt = (a, b) => [...b].findIndex((ch, i) => ch !== a[i]);
 
-export default function Rungs({ onHome }) {
+export default function Rungs({ day, onHome }) {
+  const PUZZLE = puzzleFor(day);
   const [howTo, setHowTo] = useHowTo('rungs');
-  const [state, dispatch] = useGame(KEY, reducer, fresh, { paused: howTo });
+  const [state, dispatch] = useGame(PUZZLE.key, reducerFor(PUZZLE), freshFor(PUZZLE), { paused: howTo });
   const [showResults, setShowResults] = useState(false);
   const done = state.status === 'done';
 
@@ -126,7 +135,7 @@ export default function Rungs({ onHome }) {
               <>
                 <WordInput onSubmit={submit} maxLength={PUZZLE.start.length} placeholder="Next word" shake={state.shake} />
                 <p className="mt-2 h-5 text-center text-sm font-semibold text-bad" aria-live="polite">
-                  {state.error && ERRORS[state.error]}
+                  {state.error && ERRORS[state.error](PUZZLE)}
                 </p>
                 <div className="mt-6">
                   <GiveUp onGiveUp={() => { dispatch({ type: 'giveUp' }); setShowResults(true); }} />
@@ -157,7 +166,7 @@ export default function Rungs({ onHome }) {
           <ResultActions
             onHome={onHome}
             shareText={() =>
-              `Wits · Rungs ${PUZZLE.start} → ${PUZZLE.end}\n${state.gaveUp ? 'Gave up' : `${state.steps} steps (par ${PUZZLE.par})`} · ⏱ ${formatTime(state.elapsed)}`
+              `Wits #${day} · Rungs ${PUZZLE.start} → ${PUZZLE.end}\n${state.gaveUp ? 'Gave up' : `${state.steps} steps (par ${PUZZLE.par})`} · ⏱ ${formatTime(state.elapsed)}`
             }
           />
         </Modal>

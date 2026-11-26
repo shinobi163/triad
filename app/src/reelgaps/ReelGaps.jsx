@@ -7,21 +7,26 @@ import Modal from '../components/Modal.jsx';
 import { ResultActions, Stat, StatRow } from '../components/Results.jsx';
 import { formatTime } from '../format.js';
 import { session } from '../session.js';
+import { pick } from '../daily.js';
 
 const LIMIT = data.seconds;
-const TITLES = data.titles;
-const KEY = `reelgaps-${TITLES.length}-${clueFor(TITLES.join(''))}`;
+
+// Day n's theme and titles.
+const dayOf = (day) => {
+  const { theme, titles } = pick(data.days, day);
+  return { theme, TITLES: titles, KEY: `reelgaps-${day}-${theme}` };
+};
 
 // log: one { title, solved } per title seen, in order.
 const fresh = () => ({ index: 0, log: [], elapsed: 0, status: 'playing', shake: 0 });
 
-const advance = (state, solved) => {
+const advance = (TITLES, state, solved) => {
   const log = [...state.log, { title: TITLES[state.index], solved }];
   const index = state.index + 1;
   return { ...state, log, index, status: index >= TITLES.length ? 'done' : 'playing' };
 };
 
-function reducer(state, action) {
+const reducerFor = ({ TITLES }) => (state, action) => {
   if (state.status !== 'playing') return state;
   switch (action.type) {
     case 'tick': {
@@ -29,26 +34,29 @@ function reducer(state, action) {
       return { ...state, elapsed, status: elapsed >= LIMIT ? 'done' : 'playing' };
     }
     case 'answer':
-      return isAnswer(action.text, TITLES[state.index]) ? advance(state, true) : { ...state, shake: state.shake + 1 };
+      return isAnswer(action.text, TITLES[state.index]) ? advance(TITLES, state, true) : { ...state, shake: state.shake + 1 };
     case 'skip':
-      return advance(state, false);
+      return advance(TITLES, state, false);
     case 'giveUp':
       return { ...state, status: 'done', gaveUp: true };
     default:
       return state;
   }
-}
+};
 
 const solvedCount = (s) => s.log.filter((l) => l.solved).length;
 
-export function reelGapsResults() {
+export function reelGapsResults(day) {
+  const { KEY, TITLES } = dayOf(day);
   const s = session.get(KEY);
   return s?.status === 'done' ? [{ elapsed: s.elapsed, detail: `${solvedCount(s)} of ${TITLES.length} solved${s.gaveUp ? ' · gave up' : ''}` }] : [];
 }
 
-export default function ReelGaps({ onHome }) {
+export default function ReelGaps({ day, onHome }) {
+  const D = dayOf(day);
+  const { TITLES, theme } = D;
   const [howTo, setHowTo] = useHowTo('reelgaps');
-  const [state, dispatch] = useGame(KEY, reducer, fresh, { paused: howTo });
+  const [state, dispatch] = useGame(D.KEY, reducerFor(D), fresh, { paused: howTo });
   const [showResults, setShowResults] = useState(false);
   const [flash, setFlash] = useState(false);
   const done = state.status === 'done';
@@ -79,7 +87,7 @@ export default function ReelGaps({ onHome }) {
           playLabel={`Start · ${LIMIT} seconds`}
           lines={[
             <>Each clue is a movie title with its <b>vowels and spaces removed</b>. Y stays.</>,
-            <>Today's {TITLES.length} titles are all <b>{data.theme.toLowerCase()}</b>. Type the full title; spaces and capitals don't matter.</>,
+            <>Today's {TITLES.length} titles share one theme: <b>{theme}</b>. Type the full title; spaces and capitals don't matter.</>,
             <>Solve as many as you can in {LIMIT} seconds. Stuck? Skip.</>,
           ]}
           example={<p className="font-mono">THSCLNTWRK → THE SOCIAL NETWORK</p>}
@@ -93,7 +101,7 @@ export default function ReelGaps({ onHome }) {
         </div>
       ) : (
         <>
-          <p className="mt-6 text-center text-xs font-bold uppercase tracking-[0.2em] text-fire">Theme: {data.theme}</p>
+          <p className="mt-6 text-center text-xs font-bold uppercase tracking-[0.2em] text-fire">Theme: {theme}</p>
           <p className="mt-1 text-center text-sm text-ink/70">
             Solved <b className="font-mono text-ink">{solved}</b> · Title {state.index + 1} of {TITLES.length}
           </p>
@@ -136,7 +144,7 @@ export default function ReelGaps({ onHome }) {
           </ul>
           <ResultActions
             onHome={onHome}
-            shareText={() => `Wits · Reel Gaps (${data.theme})\n🎬 ${solved}/${TITLES.length} in ${LIMIT}s\n${TITLES.map((_, i) => (state.log[i]?.solved ? '🟩' : '⬜')).join('')}`}
+            shareText={() => `Wits #${day} · Reel Gaps (${theme})\n🎬 ${solved}/${TITLES.length} in ${LIMIT}s\n${TITLES.map((_, i) => (state.log[i]?.solved ? '🟩' : '⬜')).join('')}`}
           />
         </Modal>
       )}

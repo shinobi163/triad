@@ -1,16 +1,50 @@
 {
   "seconds": 90,
-  "theme": "Biopics",
-  "titles": [
-    "The Social Network",
-    "Bohemian Rhapsody",
-    "Oppenheimer",
-    "The Imitation Game",
-    "Rocketman",
-    "A Beautiful Mind",
-    "Walk the Line",
-    "The Theory of Everything",
-    "Catch Me If You Can",
-    "Moneyball"
+  "days": [
+    { "theme": "Biopics", "titles": [
+      "The Social Network", "Bohemian Rhapsody", "Oppenheimer", "The Imitation Game", "Rocketman", "A Beautiful Mind", "Walk the Line", "The Theory of Everything", "Catch Me If You Can", "Moneyball"
+    ] },
+    { "theme": "Animated", "titles": [
+      "Toy Story", "Finding Nemo", "Frozen", "The Lion King", "Shrek", "Ratatouille", "Inside Out", "Spirited Away", "Monsters Inc", "The Incredibles"
+    ] },
+    { "theme": "Superheroes", "titles": [
+      "Iron Man", "Black Panther", "Wonder Woman", "The Dark Knight", "Spider-Man", "Captain America", "Guardians of the Galaxy", "Deadpool", "The Avengers", "Man of Steel"
+    ] },
+    { "theme": "Sci-fi", "titles": [
+      "Star Wars", "Blade Runner", "The Matrix", "Inception", "Interstellar", "Jurassic Park", "Back to the Future", "Gravity", "Arrival", "The Terminator"
+    ] },
+    { "theme": "Horror", "titles": [
+      "The Shining", "Psycho", "Halloween", "Scream", "The Exorcist", "A Quiet Place", "The Conjuring", "Hereditary", "Poltergeist", "A Nightmare on Elm Street"
+    ] },
+    { "theme": "Sports", "titles": [
+      "Rocky", "Raging Bull", "Remember the Titans", "Field of Dreams", "Million Dollar Baby", "The Karate Kid", "Space Jam", "Cool Runnings", "Bend It Like Beckham", "The Blind Side"
+    ] },
+    { "theme": "Musicals", "titles": [
+      "The Sound of Music", "Mamma Mia!", "La La Land", "The Greatest Showman", "West Side Story", "Chicago", "Mary Poppins", "Les Miserables", "Hairspray", "The Wizard of Oz"
+    ] },
+    { "theme": "Crime", "titles": [
+      "The Godfather", "Goodfellas", "Pulp Fiction", "Scarface", "The Departed", "Ocean's Eleven", "The Usual Suspects", "Reservoir Dogs", "Chinatown", "Knives Out"
+    ] },
+    { "theme": "Romance", "titles": [
+      "Titanic", "The Notebook", "Pretty Woman", "Notting Hill", "When Harry Met Sally", "Dirty Dancing", "Casablanca", "Pride & Prejudice", "Ghost", "Sleepless in Seattle"
+    ] },
+    { "theme": "Comedy", "titles": [
+      "Groundhog Day", "Mean Girls", "Superbad", "The Hangover", "Bridesmaids", "Airplane!", "Anchorman", "Ghostbusters", "Dumb and Dumber", "Mrs. Doubtfire"
+    ] },
+    { "theme": "War", "titles": [
+      "Saving Private Ryan", "Dunkirk", "Apocalypse Now", "Platoon", "Full Metal Jacket", "Black Hawk Down", "Hacksaw Ridge", "Pearl Harbor", "The Hurt Locker", "Schindler's List"
+    ] },
+    { "theme": "Fantasy", "titles": [
+      "The Hobbit", "The Princess Bride", "Labyrinth", "Stardust", "The NeverEnding Story", "Willow", "Edward Scissorhands", "Big Fish", "Maleficent", "Pirates of the Caribbean"
+    ] },
+    { "theme": "Disaster", "titles": [
+      "Twister", "Armageddon", "The Day After Tomorrow", "Deep Impact", "Independence Day", "San Andreas", "The Poseidon Adventure", "Volcano", "Dante's Peak", "The Towering Inferno"
+    ] },
+    { "theme": "Spy", "titles": [
+      "Skyfall", "Casino Royale", "Goldfinger", "Mission: Impossible", "The Bourne Identity", "Kingsman", "Tinker Tailor Soldier Spy", "From Russia with Love", "True Lies", "Atomic Blonde"
+    ] },
+    { "theme": "Christmas", "titles": [
+      "Home Alone", "Love Actually", "The Polar Express", "It's a Wonderful Life", "The Grinch", "Jingle All the Way", "The Holiday", "The Santa Clause", "Arthur Christmas", "A Christmas Carol"
+    ] }
   ]
 }

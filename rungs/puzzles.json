@@ -1,5 +1,19 @@
 {
-  "puzzles": [
-    { "id": "daily", "start": "RICH", "end": "POOR" }
+  "days": [
+    { "start": "RICH", "end": "POOR" },
+    { "start": "COLD", "end": "WARM" },
+    { "start": "LION", "end": "BEAR" },
+    { "start": "SEED", "end": "TREE" },
+    { "start": "FLOUR", "end": "BREAD" },
+    { "start": "LOVE", "end": "HATE" },
+    { "start": "SHIP", "end": "DOCK" },
+    { "start": "DUSK", "end": "DAWN" },
+    { "start": "BOOK", "end": "READ" },
+    { "start": "WILD", "end": "TAME" },
+    { "start": "SLEEP", "end": "DREAM" },
+    { "start": "FISH", "end": "BIRD" },
+    { "start": "FIRE", "end": "COAL" },
+    { "start": "MORE", "end": "LESS" },
+    { "start": "BOAT", "end": "SAIL" }
   ]
 }

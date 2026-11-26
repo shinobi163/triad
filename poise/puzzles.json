@@ -1,17 +1,19 @@
 {
-  "categories": { "left": "Fruit", "right": "Colours" },
-  "bank": {
-    "FIG": "left", "PEAR": "left", "LEMON": "left", "BANANA": "left",
-    "RED": "right", "BLUE": "right", "GREEN": "right", "YELLOW": "right"
-  },
-  "beam": {
-    "left": { "arm": 3, "slot": "A" },
-    "right": {
-      "arm": 2,
-      "beam": {
-        "left": { "arm": 1, "slot": "B" },
-        "right": { "arm": 2, "slot": "C" }
-      }
-    }
-  }
+  "days": [
+    {"categories":{"left":"Fruit","right":"Colours"},"bank":{"FIG":"left","PEAR":"left","LEMON":"left","BANANA":"left","RED":"right","BLUE":"right","GREEN":"right","YELLOW":"right"},"beam":{"left":{"arm":3,"slot":"A"},"right":{"arm":2,"beam":{"left":{"arm":1,"slot":"B"},"right":{"arm":2,"slot":"C"}}}}},
+    {"categories":{"left":"Animals","right":"Sports"},"bank":{"JUDO":"right","RUGBY":"right","HOCKEY":"right","CYCLING":"right","CAT":"left","LION":"left","ZEBRA":"left","GIRAFFE":"left"},"beam":{"left":{"arm":4,"beam":{"left":{"arm":4,"slot":"B"},"right":{"arm":3,"slot":"C"}}},"right":{"arm":4,"slot":"A"}}},
+    {"categories":{"left":"Birds","right":"Fish"},"bank":{"COD":"right","CARP":"right","SALMON":"right","SARDINE":"right","OWL":"left","STORK":"left","PIGEON":"left","OSTRICH":"left"},"beam":{"left":{"arm":2,"beam":{"left":{"arm":2,"slot":"B"},"right":{"arm":1,"slot":"C"}}},"right":{"arm":3,"slot":"A"}}},
+    {"categories":{"left":"Body parts","right":"Clothing"},"bank":{"HAND":"left","WRIST":"left","FINGER":"left","STOMACH":"left","CAP":"right","SOCK":"right","GLOVES":"right","SWEATER":"right"},"beam":{"left":{"arm":5,"slot":"A"},"right":{"arm":3,"beam":{"left":{"arm":2,"slot":"B"},"right":{"arm":3,"slot":"C"}}}}},
+    {"categories":{"left":"Weather","right":"Vegetables"},"bank":{"PEA":"right","KALE":"right","ONION":"right","TURNIP":"right","SNOW":"left","CLOUD":"left","BREEZE":"left","THUNDER":"left"},"beam":{"left":{"arm":3,"beam":{"left":{"arm":3,"slot":"B"},"right":{"arm":2,"slot":"C"}}},"right":{"arm":5,"slot":"A"}}},
+    {"categories":{"left":"Instruments","right":"Furniture"},"bank":{"HARP":"left","FLUTE":"left","VIOLIN":"left","TRUMPET":"left","BED":"right","SOFA":"right","CHAIR":"right","CABINET":"right"},"beam":{"left":{"arm":4,"slot":"A"},"right":{"arm":4,"beam":{"left":{"arm":3,"slot":"B"},"right":{"arm":4,"slot":"C"}}}}},
+    {"categories":{"left":"Metals","right":"Trees"},"bank":{"ELM":"right","PINE":"right","SPRUCE":"right","CYPRESS":"right","TIN":"left","ZINC":"left","STEEL":"left","NICKEL":"left"},"beam":{"left":{"arm":4,"beam":{"left":{"arm":4,"slot":"B"},"right":{"arm":3,"slot":"C"}}},"right":{"arm":4,"slot":"A"}}},
+    {"categories":{"left":"Jobs","right":"Drinks"},"bank":{"COOK":"left","BAKER":"left","FARMER":"left","PLUMBER":"left","TEA":"right","SODA":"right","WATER":"right","COFFEE":"right"},"beam":{"left":{"arm":5,"slot":"A"},"right":{"arm":3,"beam":{"left":{"arm":2,"slot":"B"},"right":{"arm":3,"slot":"C"}}}}},
+    {"categories":{"left":"Planets","right":"Gems"},"bank":{"OPAL":"right","PEARL":"right","GARNET":"right","DIAMOND":"right","MARS":"left","EARTH":"left","SATURN":"left","MERCURY":"left"},"beam":{"left":{"arm":3,"beam":{"left":{"arm":3,"slot":"B"},"right":{"arm":2,"slot":"C"}}},"right":{"arm":5,"slot":"A"}}},
+    {"categories":{"left":"Vehicles","right":"Flowers"},"bank":{"ROSE":"right","TULIP":"right","DAHLIA":"right","PETUNIA":"right","BUS":"left","TRAM":"left","TRAIN":"left","TRACTOR":"left"},"beam":{"left":{"arm":4,"beam":{"left":{"arm":4,"slot":"B"},"right":{"arm":3,"slot":"C"}}},"right":{"arm":4,"slot":"A"}}},
+    {"categories":{"left":"Kitchen","right":"Insects"},"bank":{"CUP":"left","LADLE":"left","KETTLE":"left","BLENDER":"left","ANT":"right","MOTH":"right","LOUSE":"right","LOCUST":"right"},"beam":{"left":{"arm":4,"slot":"A"},"right":{"arm":4,"beam":{"left":{"arm":3,"slot":"B"},"right":{"arm":4,"slot":"C"}}}}},
+    {"categories":{"left":"Shapes","right":"Animals"},"bank":{"CONE":"left","PRISM":"left","SQUARE":"left","PYRAMID":"left","PIG":"right","GOAT":"right","DONKEY":"right","GIRAFFE":"right"},"beam":{"left":{"arm":3,"slot":"A"},"right":{"arm":2,"beam":{"left":{"arm":1,"slot":"B"},"right":{"arm":2,"slot":"C"}}}}},
+    {"categories":{"left":"Colours","right":"Vegetables"},"bank":{"YAM":"right","ONION":"right","CARROT":"right","CABBAGE":"right","TAN":"left","BLUE":"left","WHITE":"left","MAROON":"left"},"beam":{"left":{"arm":2,"beam":{"left":{"arm":2,"slot":"B"},"right":{"arm":1,"slot":"C"}}},"right":{"arm":3,"slot":"A"}}},
+    {"categories":{"left":"Countries","right":"Instruments"},"bank":{"DRUM":"right","CELLO":"right","GUITAR":"right","TRUMPET":"right","CUBA":"left","NEPAL":"left","MEXICO":"left","IRELAND":"left"},"beam":{"left":{"arm":3,"beam":{"left":{"arm":3,"slot":"B"},"right":{"arm":2,"slot":"C"}}},"right":{"arm":5,"slot":"A"}}},
+    {"categories":{"left":"Sports","right":"Drinks"},"bank":{"GOLF":"left","RUGBY":"left","TENNIS":"left","ARCHERY":"left","TEA":"right","SODA":"right","COCOA":"right","COFFEE":"right"},"beam":{"left":{"arm":4,"slot":"A"},"right":{"arm":4,"beam":{"left":{"arm":3,"slot":"B"},"right":{"arm":4,"slot":"C"}}}}}
+  ]
 }

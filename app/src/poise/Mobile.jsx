@@ -3,7 +3,8 @@
 import { isBalanced, slotIds, tilt } from '../../../poise/engine.mjs';
 
 // Drawing units (SVG px).
-const U = 40;          // one unit of arm length
+const MAX_U = 40;      // one unit of arm length, at most
+const ARMS_W = 300;    // wider mobiles get shorter units, so tags stay readable on a phone
 const STRING = 56;     // hanger length
 const TAG_W = 92;      // room reserved for the widest tag
 const TAG_H = 34;
@@ -12,15 +13,33 @@ export const SIDE_TINT = { left: '#C2410C', right: '#1D4ED8' }; // Fruit / Colou
 
 const tagWidth = (word) => 24 + word.length * 11;
 
+// Leftmost and rightmost arm ends, in arm units from the top pivot.
+function armSpan(beam) {
+  let min = 0;
+  let max = 0;
+  for (const side of ['left', 'right']) {
+    const x = (side === 'left' ? -1 : 1) * beam[side].arm;
+    const inner = beam[side].beam ? armSpan(beam[side].beam) : { min: 0, max: 0 };
+    min = Math.min(min, x + inner.min);
+    max = Math.max(max, x + inner.max);
+  }
+  return { min, max };
+}
+
+const unitFor = (beam) => {
+  const { min, max } = armSpan(beam);
+  return Math.min(MAX_U, Math.floor(ARMS_W / (max - min)));
+};
+
 // Bounding box of a beam drawn level, relative to its pivot.
-function extent(beam) {
+function extent(beam, U) {
   let minX = 0;
   let maxX = 0;
   let maxY = 0;
   for (const side of ['left', 'right']) {
     const x = (side === 'left' ? -1 : 1) * beam[side].arm * U;
     if (beam[side].beam) {
-      const e = extent(beam[side].beam);
+      const e = extent(beam[side].beam, U);
       minX = Math.min(minX, x + e.minX);
       maxX = Math.max(maxX, x + e.maxX);
       maxY = Math.max(maxY, STRING + e.maxY);
@@ -67,7 +86,7 @@ function pullLabel(arm, weights) {
   return `${hanging}×${arm.arm}=${hanging * arm.arm}`;
 }
 
-function Beam({ beam, weights, placed, ui, side, depth }) {
+function Beam({ beam, weights, placed, ui, side, depth, U }) {
   const angle = tilt(beam, weights);
   const color = isBalanced(beam, weights) ? '#16A34A' : '#121212';
   const leftX = -beam.left.arm * U;
@@ -103,7 +122,7 @@ function Beam({ beam, weights, placed, ui, side, depth }) {
               <line x1={0} y1={0} x2={0} y2={STRING} stroke="#737373" strokeWidth={1.5} />
               <g transform={`translate(0 ${STRING})`}>
                 {arm.beam ? (
-                  <Beam beam={arm.beam} weights={weights} placed={placed} ui={ui} side={armSide} depth={depth + 1} />
+                  <Beam beam={arm.beam} weights={weights} placed={placed} ui={ui} side={armSide} depth={depth + 1} U={U} />
                 ) : (
                   <Hook slot={arm.slot} word={placed[arm.slot]} side={armSide} selected={ui.selectedSlot === arm.slot} onTap={ui.onTapSlot} />
                 )}
@@ -117,7 +136,8 @@ function Beam({ beam, weights, placed, ui, side, depth }) {
 }
 
 export default function Mobile({ beam, weights, placed, ui }) {
-  const e = extent(beam);
+  const U = unitFor(beam);
+  const e = extent(beam, U);
   const pad = 30;   // room for the swing
   const top = 76;   // ceiling, hanger, pulls and category labels above the main pivot
   return (
@@ -129,7 +149,7 @@ export default function Mobile({ beam, weights, placed, ui }) {
     >
       <line x1={-30} y1={-top + 6} x2={30} y2={-top + 6} stroke="#121212" strokeWidth={3} strokeLinecap="round" />
       <line x1={0} y1={-top + 6} x2={0} y2={0} stroke="#737373" strokeWidth={1.5} />
-      <Beam beam={beam} weights={weights} placed={placed} ui={ui} depth={0} />
+      <Beam beam={beam} weights={weights} placed={placed} ui={ui} depth={0} U={U} />
     </svg>
   );
 }

@@ -8,15 +8,26 @@ import { ResultActions, Stat, StatRow } from '../components/Results.jsx';
 import { commonWords, isWord } from '../words.js';
 import { formatTime } from '../format.js';
 import { session } from '../session.js';
+import { pick } from '../daily.js';
 
 const LENGTHS = [4, 5, 6];
-const PUZZLES = Object.fromEntries(
-  LENGTHS.map((n) => {
-    const secret = data.secrets[n];
-    const sorted = [...commonWords(n)].sort();   // distances on the meter count these
-    return [n, { n, secret, sorted, par: idealGuesses(sorted, secret), key: `lockpick-${n}-${secret}` }];
-  }),
-);
+const SORTED = Object.fromEntries(LENGTHS.map((n) => [n, [...commonWords(n)].sort()]));   // distances on the meter count these
+
+// Day n's three locks, one per length.
+const cache = new Map();
+function puzzlesFor(day) {
+  if (!cache.has(day)) {
+    const secrets = pick(data.days, day);
+    cache.set(day, Object.fromEntries(
+      LENGTHS.map((n) => {
+        const secret = secrets[n];
+        const sorted = SORTED[n];
+        return [n, { n, secret, sorted, par: idealGuesses(sorted, secret), key: `lockpick-${day}-${n}-${secret}` }];
+      }),
+    ));
+  }
+  return cache.get(day);
+}
 const LENGTH_KEY = 'lockpick-length';
 
 const ERRORS = { word: 'Not in the word list.', ruled: 'Already ruled out.' };
@@ -35,7 +46,8 @@ const reducerFor = (p) => (state, action) => {
   return { ...state, guesses: [...state.guesses, word], error: null, status: word === p.secret ? 'done' : 'playing' };
 };
 
-export function lockpickResults() {
+export function lockpickResults(day) {
+  const PUZZLES = puzzlesFor(day);
   return LENGTHS.flatMap((n) => {
     const s = session.get(PUZZLES[n].key);
     if (s?.status !== 'done') return [];
@@ -118,23 +130,23 @@ function Ladder({ p, guesses, done }) {
   );
 }
 
-export default function Lockpick({ onHome }) {
+export default function Lockpick({ day, onHome }) {
   const [howTo, setHowTo] = useHowTo('lockpick');
   const [n, setN] = useState(() => session.get(LENGTH_KEY) ?? 5);
-  const p = PUZZLES[n];
+  const p = puzzlesFor(day)[n];
   const pickLength = (len) => {
     session.set(LENGTH_KEY, len);
     setN(len);
   };
   return (
     // key: each length is its own game with its own clock
-    <Board key={n} p={p} howTo={howTo} setHowTo={setHowTo} onHome={onHome}>
+    <Board key={n} day={day} p={p} howTo={howTo} setHowTo={setHowTo} onHome={onHome}>
       <LengthPicker value={n} onChange={pickLength} />
     </Board>
   );
 }
 
-function Board({ p, howTo, setHowTo, onHome, children }) {
+function Board({ day, p, howTo, setHowTo, onHome, children }) {
   const [state, dispatch] = useGame(p.key, reducerFor(p), fresh, { paused: howTo });
   const [showResults, setShowResults] = useState(false);
   const done = state.status === 'done';
@@ -206,7 +218,7 @@ function Board({ p, howTo, setHowTo, onHome, children }) {
           <ResultActions
             onHome={onHome}
             shareText={() =>
-              `Wits · Lockpick (${p.n} letters)\n${state.gaveUp ? 'Gave up' : `${state.guesses.length} guesses (par ${p.par})`} · ⏱ ${formatTime(state.elapsed)}`
+              `Wits #${day} · Lockpick (${p.n} letters)\n${state.gaveUp ? 'Gave up' : `${state.guesses.length} guesses (par ${p.par})`} · ⏱ ${formatTime(state.elapsed)}`
             }
           />
         </Modal>

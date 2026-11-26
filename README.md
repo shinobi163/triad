@@ -1,6 +1,6 @@
 # Wits — prototype
 
-Six daily word games. React + Vite + Tailwind.
+Six daily word games, new puzzles every midnight. React + Vite + Tailwind.
 
 **Play it:** https://shinobi163.github.io/triad/ (rebuilt and republished on every push to `main`; the deploy fails if any puzzle checker fails).
 
@@ -12,7 +12,7 @@ lockpick/   before/after guess   engine.mjs · puzzles.json · check.mjs
 reelgaps/   movie time trial     engine.mjs · puzzles.json · check.mjs
 relay/      word chain           engine.mjs · puzzles.json · check.mjs
 stowaway/   hidden word          engine.mjs · puzzles.json · check.mjs
-poise/      word mobile          engine.mjs · balance.mjs · puzzles.json · check.mjs
+poise/      word mobile          engine.mjs · balance.mjs · puzzles.json · check.mjs · generate.mjs
 ```
 
 Each game's rules live in its `engine.mjs`, which both the app and that game's
@@ -28,11 +28,25 @@ npm run dev
 
 Open http://localhost:5173. Each game also has its own address (`#rungs`, `#lockpick`, …).
 
+- **Daily puzzles.** Wits #1 is 26 November 2026; each local midnight is the next number (`app/src/daily.js`). The opening screen shows **#N**, and **‹ ›** step back through earlier days (never ahead of today). In development, `?day=N` opens any day: http://localhost:5173/?day=5
 - Every game opens on a How-to screen (three lines, one example, **Play**) the first time each visit; **?** brings it back.
 - **‹ Games** (top left) and **‹ Back to all games** (on every results card) return to the list at any time; the browser Back button works too. Leaving keeps the game as it was.
 - Every game has **Give up** (tap twice), which ends the game and shows the answer.
 - The list shows a ✓ line only for puzzles finished this visit.
 - Nothing is saved between visits: progress lives in memory (`app/src/session.js`).
+
+## Daily puzzles
+
+Each game's `puzzles.json` holds a list of `days`; day N plays entry N (and wraps round to the top if the list runs out, so the site never breaks). Today there are 15 days per game, running to 10 December 2026. To add more, append entries and run `npm run check`: every checker prints how long its list lasts and warns when fewer than 7 days are left. Keep `START` in `app/src/daily.js` and `words/days.mjs` the same.
+
+| Game | One day is | Notes |
+| --- | --- | --- |
+| Rungs | `{ start, end }` | Par must be 3-8 through common words. |
+| Lockpick | `{ "4": …, "5": …, "6": … }` | Common words only; no secret twice. |
+| Reel Gaps | `{ theme, titles: [10] }` | Every clue 4+ consonants; no title on two days. |
+| Relay | `{ category, start }` | Categories live in the same file; `"united states|usa|america"` gives one entry several names. |
+| Stowaway | `{ theme, themeWords, sentences: [5] }` | `theme` is singular ("Animal"); no other theme word may hide in a sentence. |
+| Poise | a level | `node poise/generate.mjs` finds one-answer levels for category pairs; paste them in. |
 
 ## Checking puzzles
 
@@ -48,9 +62,9 @@ npm run words    # rebuilds words/words.json after editing the word lists
 
 **Lockpick.** Find the secret word. Each guess says whether the secret comes before or after it alphabetically. 4, 5 or 6 letters (Easy, Medium, Hard). Invalid or already-ruled-out guesses shake and don't count. A meter shows how close each guess is (Cold → Burning), measured in common words between the guess and the secret. Par is what perfect halving of the common words would take.
 
-**Reel Gaps.** 90 seconds, 10 titles on one theme (today: Biopics). Each clue is a movie title with vowels (A E I O U) and spaces removed; Y stays. Answers ignore spaces, punctuation, capitals and a leading "The", "A" or "An". Skip moves on.
+**Reel Gaps.** 90 seconds, 10 titles on one theme (Biopics, Animated, Superheroes, …). Each clue is a movie title with vowels (A E I O U) and spaces removed; Y stays. Answers ignore spaces, punctuation, capitals and a leading "The", "A" or "An". Skip moves on.
 
-**Relay.** 60 seconds. Each word must start with the last letter of the one before, be on the day's category list, and not repeat. A word one typo away from exactly one list word counts as that word (RACOON → RACCOON); plurals point you to the singular; every rejection says why. Hint shows a possible word's length and first letter, then its last letter. Pass hands over a fresh word when you're stuck (it doesn't score).
+**Relay.** 60 seconds. Each word must start with the last letter of the one before, be on the day's category list (Animals, Countries, Fruit and veg, Capital cities or Sports), and not repeat. Some entries have other names (USA, AMERICA); any name links, but the entry counts once. A word one typo away from exactly one list word counts as that word (RACOON → RACCOON); plurals point you to the singular; every rejection says why. Hint shows a possible word's length and first letter, then its last letter. Pass hands over a fresh word when you're stuck (it doesn't score).
 
 **Stowaway.** Five sentences, each hiding a themed word across a word gap. Tap its first letter, then its last.
 
@@ -62,4 +76,4 @@ npm run words    # rebuilds words/words.json after editing the word lists
 - `words/popular.txt`: the ENABLE words that also appear in TV/film subtitle frequency lists ([dolph/dictionary](https://github.com/dolph/dictionary)). Answers, secrets and shown routes come only from these. Check its licence before a public launch.
 - `words/blocklist.txt`: words never used as an answer or shown in a route.
 
-Not built yet: daily rotation (each game has one fixed puzzle), sound, saving between visits.
+Not built yet: sound, saving between visits, streaks.

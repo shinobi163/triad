@@ -1,21 +1,42 @@
 import { GAMES } from './games.js';
 import { formatTime } from './format.js';
+import { dateOf, dayNumber } from './daily.js';
 
-export default function Hub({ onOpen }) {
-  const today = new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
+// The day switcher's arrows: ‹ goes back a day, › forward (up to today).
+function Arrow({ label, onClick, disabled, children }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      aria-label={label}
+      className="grid h-9 w-9 place-items-center rounded-full text-xl text-ink/60 hover:bg-black/5 hover:text-ink disabled:invisible"
+    >
+      {children}
+    </button>
+  );
+}
+
+export default function Hub({ day, latest, onDay, onOpen }) {
+  const isToday = day === dayNumber();
+  const date = dateOf(day).toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
   // Results appear only for puzzles finished this visit.
-  const games = GAMES.map((g) => ({ ...g, finished: g.results() }));
+  const games = GAMES.map((g) => ({ ...g, finished: g.results(day) }));
   const doneCount = games.filter((g) => g.finished.length).length;
 
   return (
     <div className="min-h-[100dvh] bg-paper">
       <main className="mx-auto max-w-md px-4 pb-12 pt-12 sm:pt-20">
         <h1 className="font-serif text-5xl font-bold tracking-tight">Wits</h1>
-        <p className="mt-2 text-sm text-ink/60">
-          {today} · {doneCount} of {games.length} played
-        </p>
+        <div className="-ml-2 mt-2 flex items-center gap-1">
+          <Arrow label="Previous day" onClick={() => onDay(day - 1)} disabled={day <= 1}>‹</Arrow>
+          <p className="text-sm text-ink/60" aria-live="polite">
+            <b className="font-mono text-ink">#{day}</b> · {isToday ? 'Today' : date} · {doneCount} of {games.length} played
+          </p>
+          <Arrow label="Next day" onClick={() => onDay(day + 1)} disabled={day >= latest}>›</Arrow>
+        </div>
 
-        <ul className="mt-8 divide-y divide-rule border-y border-rule">
+        <ul className="mt-6 divide-y divide-rule border-y border-rule">
           {games.map((g) => (
             <li key={g.id}>
               <button
@@ -39,7 +60,10 @@ export default function Hub({ onOpen }) {
           ))}
         </ul>
 
-        <p className="mt-6 text-xs text-ink/45">Progress lasts until you close or reload this page.</p>
+        <p className="mt-6 text-xs text-ink/45">
+          New puzzles every midnight. {isToday ? (day > 1 ? 'Use ‹ to play earlier days.' : '') : <button type="button" onClick={() => onDay(dayNumber())} className="font-semibold underline">Back to today</button>}
+          {' '}Progress lasts until you close or reload this page.
+        </p>
       </main>
     </div>
   );

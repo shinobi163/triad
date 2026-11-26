@@ -1,26 +1,169 @@
 {
-  "theme": "Fruit",
-  "themeWords": ["APPLE", "APRICOT", "BANANA", "CHERRY", "DATE", "FIG", "GRAPE", "GUAVA", "KIWI", "LEMON", "LIME", "LYCHEE", "MANGO", "MELON", "OLIVE", "ORANGE", "PAPAYA", "PEACH", "PEAR", "PLUM", "QUINCE", "SLOE"],
-  "sentences": [
+  "days": [
     {
-      "text": "Please keep each receipt safe.",
-      "answer": "PEACH"
+      "theme": "Fruit",
+      "themeWords": ["APPLE","APRICOT","BANANA","CHERRY","DATE","FIG","GRAPE","GUAVA","KIWI","LEMON","LIME","LYCHEE","MANGO","MELON","OLIVE","ORANGE","PAPAYA","PEACH","PEAR","PLUM","QUINCE","SLOE"],
+      "sentences": [
+        {"text":"Please keep each receipt safe.","answer":"PEACH"},
+        {"text":"The camel I met was friendly.","answer":"LIME"},
+        {"text":"He swung the mop lumbering down the hall.","answer":"PLUM"},
+        {"text":"The hostile monkeys stole our lunch.","answer":"LEMON"},
+        {"text":"My dad ate the last cookie.","answer":"DATE"}
+      ]
     },
     {
-      "text": "The camel I met was friendly.",
-      "answer": "LIME"
+      "theme": "Animal",
+      "themeWords": ["BEAR","GOAT","LION","CAMEL","SEAL","DEER","WOLF","MOLE","HORSE","MOUSE","TIGER","ZEBRA","SHEEP","MOOSE","OTTER","LLAMA","HIPPO","PANDA","SKUNK","SNAKE","TOAD","FROG","HARE","LAMB","MULE","BISON"],
+      "sentences": [
+        {"text":"Bob earned a gold medal at the games.","answer":"BEAR"},
+        {"text":"Try the big oat cookies.","answer":"GOAT"},
+        {"text":"Cal, I only want tea.","answer":"LION"},
+        {"text":"Rebecca melted the butter.","answer":"CAMEL"},
+        {"text":"These all belong to me.","answer":"SEAL"}
+      ]
     },
     {
-      "text": "He swung the mop lumbering down the hall.",
-      "answer": "PLUM"
+      "theme": "Colour",
+      "themeWords": ["PINK","GREY","GREEN","BLACK","WHITE","BLUE","TEAL","GOLD","BROWN","AMBER","LILAC","MAUVE","OCHRE","PURPLE","YELLOW","ORANGE","CREAM","BEIGE","NAVY","RUST"],
+      "sentences": [
+        {"text":"We stop in Kansas tonight.","answer":"PINK"},
+        {"text":"The ogre yawned loudly.","answer":"GREY"},
+        {"text":"The big reenactment drew crowds.","answer":"GREEN"},
+        {"text":"Bob lacks patience.","answer":"BLACK"},
+        {"text":"Now hit enter to begin.","answer":"WHITE"}
+      ]
     },
     {
-      "text": "The hostile monkeys stole our lunch.",
-      "answer": "LEMON"
+      "theme": "Body part",
+      "themeWords": ["KNEE","HAND","CHIN","HEEL","ANKLE","BACK","BRAIN","CHEEK","CHEST","ELBOW","FACE","FINGER","FOOT","HEAD","HEART","LIVER","LUNG","MOUTH","NAIL","NECK","NOSE","SHIN","SKIN","THUMB","TOOTH","WRIST","LIPS","HAIR","BROW"],
+      "sentences": [
+        {"text":"She knits with pink needles.","answer":"KNEE"},
+        {"text":"We teach and learn together.","answer":"HAND"},
+        {"text":"Such interesting news!","answer":"CHIN"},
+        {"text":"The elephant drank slowly.","answer":"HEEL"},
+        {"text":"Frank leaped over the fence.","answer":"ANKLE"}
+      ]
     },
     {
-      "text": "My dad ate the last cookie.",
-      "answer": "DATE"
+      "theme": "Vegetable",
+      "themeWords": ["KALE","BEAN","OKRA","CHARD","ENDIVE","LEEK","CORN","ONION","BEET","CARROT","TURNIP","RADISH","CELERY","POTATO","PEPPER","SQUASH","MARROW","SWEDE","PARSNIP","LETTUCE","CABBAGE","SPINACH","GARLIC"],
+      "sentences": [
+        {"text":"They drink ale at the pub.","answer":"KALE"},
+        {"text":"Don't be anxious about it.","answer":"BEAN"},
+        {"text":"I cook rarely on weekdays.","answer":"OKRA"},
+        {"text":"Each ardent fan cheered.","answer":"CHARD"},
+        {"text":"Count to ten, then dive in.","answer":"ENDIVE"}
+      ]
+    },
+    {
+      "theme": "Number",
+      "themeWords": ["FOUR","FIVE","SEVEN","THREE","NINE","EIGHT","ZERO","TWELVE","ELEVEN","TWENTY","FIFTY","HUNDRED","THOUSAND","MILLION"],
+      "sentences": [
+        {"text":"If our team wins, we celebrate.","answer":"FOUR"},
+        {"text":"Call me if I've missed anything.","answer":"FIVE"},
+        {"text":"These vendors sell fruit.","answer":"SEVEN"},
+        {"text":"A pond with reeds and frogs.","answer":"THREE"},
+        {"text":"Lin, I never knew!","answer":"NINE"}
+      ]
+    },
+    {
+      "theme": "Metal",
+      "themeWords": ["IRON","GOLD","LEAD","ZINC","STEEL","BRASS","SILVER","COPPER","BRONZE","NICKEL","CHROME","COBALT","MERCURY","PLATINUM","TITANIUM"],
+      "sentences": [
+        {"text":"Their only son lives abroad.","answer":"IRON"},
+        {"text":"They live in a big old house.","answer":"GOLD"},
+        {"text":"Smile, Adam!","answer":"LEAD"},
+        {"text":"Phones buzz in class too often.","answer":"ZINC"},
+        {"text":"This shop sells the best eel pie.","answer":"STEEL"}
+      ]
+    },
+    {
+      "theme": "Tree",
+      "themeWords": ["PINE","PALM","CEDAR","MAPLE","ROWAN","BIRCH","BEECH","LARCH","HOLLY","ALDER","ASPEN","WILLOW","SPRUCE","CYPRESS","POPLAR","LINDEN","HAZEL","ELDER"],
+      "sentences": [
+        {"text":"Stop, I need a rest.","answer":"PINE"},
+        {"text":"They found an opal mine.","answer":"PALM"},
+        {"text":"The mice darted away.","answer":"CEDAR"},
+        {"text":"Ma, please pass the salt.","answer":"MAPLE"},
+        {"text":"Don't throw an egg at me.","answer":"ROWAN"}
+      ]
+    },
+    {
+      "theme": "Bird",
+      "themeWords": ["CROW","DOVE","HAWK","WREN","ROBIN","EAGLE","GULL","KITE","LARK","SWAN","DUCK","GOOSE","HERON","STORK","RAVEN","FINCH","TERN"],
+      "sentences": [
+        {"text":"The doc rowed the boat.","answer":"CROW"},
+        {"text":"Rod overslept today.","answer":"DOVE"},
+        {"text":"Oh, awkward!","answer":"HAWK"},
+        {"text":"The new rent is too high.","answer":"WREN"},
+        {"text":"Ask Rob in the morning.","answer":"ROBIN"}
+      ]
+    },
+    {
+      "theme": "Fish",
+      "themeWords": ["CARP","PIKE","HAKE","SOLE","TROUT","TUNA","BASS","PERCH","SHARK","SALMON","BREAM","PLAICE","SPRAT","HERRING","GUPPY","MINNOW"],
+      "sentences": [
+        {"text":"Oscar pays the bill.","answer":"CARP"},
+        {"text":"Please stop Ike from leaving.","answer":"PIKE"},
+        {"text":"Oh, a kettle! Let's make tea.","answer":"HAKE"},
+        {"text":"She also left early.","answer":"SOLE"},
+        {"text":"We got route maps at the station.","answer":"TROUT"}
+      ]
+    },
+    {
+      "theme": "Country",
+      "themeWords": ["PERU","CHAD","IRAN","IRAQ","OMAN","MALI","CUBA","FIJI","LAOS","TOGO","CHINA","INDIA","JAPAN","SPAIN","ITALY","KENYA","NEPAL","EGYPT","CHILE","WALES","NIGER","GHANA","SUDAN","QATAR","SYRIA","YEMEN","FRANCE"],
+      "sentences": [
+        {"text":"I hope Rufus wins the race.","answer":"PERU"},
+        {"text":"Each adult pays full price.","answer":"CHAD"},
+        {"text":"Their antics made us laugh.","answer":"IRAN"},
+        {"text":"Tom and Jerry is a cartoon.","answer":"OMAN"},
+        {"text":"Ma, listen to this!","answer":"MALI"}
+      ]
+    },
+    {
+      "theme": "Instrument",
+      "themeWords": ["DRUM","LYRE","SITAR","BELL","HORN","HARP","TUBA","FLUTE","BANJO","CELLO","GUITAR","VIOLIN","TRUMPET","PIANO","ORGAN","OBOE","GONG","BUGLE","VIOLA","LUTE","FIFE","TABLA","KAZOO"],
+      "sentences": [
+        {"text":"They sold rum and cider.","answer":"DRUM"},
+        {"text":"The fully restored car shone.","answer":"LYRE"},
+        {"text":"We visit arcades on Fridays.","answer":"SITAR"},
+        {"text":"The rebel leaders met at dawn.","answer":"BELL"},
+        {"text":"Rich or not, she is kind.","answer":"HORN"}
+      ]
+    },
+    {
+      "theme": "Drink",
+      "themeWords": ["SODA","WINE","BEER","COLA","WATER","MILK","JUICE","COCOA","CIDER","COFFEE","MEAD","PUNCH","LATTE","MOCHA","SHAKE"],
+      "sentences": [
+        {"text":"Picasso dazzled the critics.","answer":"SODA"},
+        {"text":"Draw in elegant letters.","answer":"WINE"},
+        {"text":"Maybe Erin knows.","answer":"BEER"},
+        {"text":"The taco lady waved.","answer":"COLA"},
+        {"text":"The cow ate roses.","answer":"WATER"}
+      ]
+    },
+    {
+      "theme": "Gem",
+      "themeWords": ["RUBY","OPAL","PEARL","AMBER","AGATE","JADE","TOPAZ","GARNET","EMERALD","DIAMOND","ONYX","QUARTZ","SAPPHIRE","CORAL"],
+      "sentences": [
+        {"text":"The guru by the river smiled.","answer":"RUBY"},
+        {"text":"You look so pale today.","answer":"OPAL"},
+        {"text":"We hope Arlene comes.","answer":"PEARL"},
+        {"text":"I am Bernard, your guide.","answer":"AMBER"},
+        {"text":"The saga tells of kings.","answer":"AGATE"}
+      ]
+    },
+    {
+      "theme": "Item of clothing",
+      "themeWords": ["COAT","SCARF","BELT","ROBE","VEST","SOCK","SHOE","BOOT","SHIRT","SKIRT","DRESS","GOWN","HOOD","JEANS","GLOVE","CAPE","CLOAK","KILT","SARI","SUIT","SHAWL"],
+      "sentences": [
+        {"text":"Grab a taco at lunch.","answer":"COAT"},
+        {"text":"This car fails every test.","answer":"SCARF"},
+        {"text":"The rebel troops advanced.","answer":"BELT"},
+        {"text":"Rob, Ellen is here.","answer":"ROBE"},
+        {"text":"It's a love story.","answer":"VEST"}
+      ]
     }
   ]
 }
