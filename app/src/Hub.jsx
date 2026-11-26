@@ -1,6 +1,21 @@
 import { GAMES } from './games.js';
 import { formatTime } from './format.js';
 import { dateOf, dayNumber } from './daily.js';
+import { streak } from './streak.js';
+
+// "3-day streak · Best 5", plus a nudge when today still needs a game.
+function Streak() {
+  const { current, best, today } = streak();
+  if (!best) return null;
+  return (
+    <p className="mt-1 text-sm text-ink/60" aria-label="Streak">
+      <span aria-hidden="true">🔥 </span>
+      <b className="text-ink">{current}-day streak</b>
+      {best > current && ` · Best ${best}`}
+      {!today && current > 0 && ' · Play today to keep it going'}
+    </p>
+  );
+}
 
 // The day switcher's arrows: ‹ goes back a day, › forward (up to today).
 function Arrow({ label, onClick, disabled, children }) {
@@ -20,7 +35,6 @@ function Arrow({ label, onClick, disabled, children }) {
 export default function Hub({ day, latest, onDay, onOpen }) {
   const isToday = day === dayNumber();
   const date = dateOf(day).toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
-  // Results appear only for puzzles finished this visit.
   const games = GAMES.map((g) => ({ ...g, finished: g.results(day) }));
   const doneCount = games.filter((g) => g.finished.length).length;
 
@@ -35,6 +49,7 @@ export default function Hub({ day, latest, onDay, onOpen }) {
           </p>
           <Arrow label="Next day" onClick={() => onDay(day + 1)} disabled={day >= latest}>›</Arrow>
         </div>
+        <Streak />
 
         <ul className="mt-6 divide-y divide-rule border-y border-rule">
           {games.map((g) => (
@@ -62,7 +77,7 @@ export default function Hub({ day, latest, onDay, onOpen }) {
 
         <p className="mt-6 text-xs text-ink/45">
           New puzzles every midnight. {isToday ? (day > 1 ? 'Use ‹ to play earlier days.' : '') : <button type="button" onClick={() => onDay(dayNumber())} className="font-semibold underline">Back to today</button>}
-          {' '}Progress lasts until you close or reload this page.
+          {' '}Progress is saved in this browser.
         </p>
       </main>
     </div>

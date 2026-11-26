@@ -1,5 +1,5 @@
 // Every game on the opening screen, in order. `results(day)` lists the
-// puzzles of that day finished this visit as { label?, elapsed, detail }.
+// puzzles of that day finished (saved in this browser) as { label?, elapsed, detail }.
 import Rungs, { rungsResults } from './rungs/Rungs.jsx';
 import Lockpick, { lockpickResults } from './lockpick/Lockpick.jsx';
 import ReelGaps, { reelGapsResults } from './reelgaps/ReelGaps.jsx';

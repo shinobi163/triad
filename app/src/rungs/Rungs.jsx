@@ -85,7 +85,7 @@ const diffAt = (a, b) => [...b].findIndex((ch, i) => ch !== a[i]);
 export default function Rungs({ day, onHome }) {
   const PUZZLE = puzzleFor(day);
   const [howTo, setHowTo] = useHowTo('rungs');
-  const [state, dispatch] = useGame(PUZZLE.key, reducerFor(PUZZLE), freshFor(PUZZLE), { paused: howTo });
+  const [state, dispatch] = useGame(PUZZLE.key, reducerFor(PUZZLE), freshFor(PUZZLE), { paused: howTo, day });
   const [showResults, setShowResults] = useState(false);
   const done = state.status === 'done';
 

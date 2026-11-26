@@ -1,9 +1,10 @@
 // What every game shares: the top bar, the How-to screen and the game state.
 import { useEffect, useReducer, useState } from 'react';
 import { session } from '../session.js';
+import { markPlayed } from '../streak.js';
 
 // ‹ Games on the left is always the way out. Leaving keeps the game as it is
-// for this visit, so there is nothing to confirm.
+// (saved in this browser), so there is nothing to confirm.
 export function GameFrame({ title, clock, onHome, onHelp, children }) {
   return (
     <div className="flex min-h-[100dvh] flex-col bg-paper">
@@ -66,15 +67,20 @@ export function useHowTo(id) {
   return [open, setOpen];
 }
 
-// A game's state, kept in the session store under `key` so leaving and
-// returning resumes it. The reducer must handle { type: 'tick' }, which
-// arrives once a second while status is 'playing' and the game isn't paused.
-export function useGame(key, reducer, init, { paused }) {
+// A game's state, saved under `key` so leaving, reloading or coming back
+// later resumes it. The reducer must handle { type: 'tick' }, which arrives
+// once a second while status is 'playing' and the game isn't paused.
+// Finishing day `day`'s game on that day counts towards the streak.
+export function useGame(key, reducer, init, { paused, day }) {
   const [state, dispatch] = useReducer(reducer, key, (k) => session.get(k) ?? init());
 
   useEffect(() => {
     session.set(key, state);
   }, [key, state]);
+
+  useEffect(() => {
+    if (state.status === 'done') markPlayed(day);
+  }, [state.status, day]);
 
   useEffect(() => {
     if (state.status !== 'playing' || paused) return undefined;

@@ -71,7 +71,7 @@ export default function Stowaway({ day, onHome }) {
   const D = dayOf(day);
   const { SENTENCES, theme } = D;
   const [howTo, setHowTo] = useHowTo('stowaway');
-  const [state, dispatch] = useGame(D.KEY, reducerFor(D), fresh, { paused: howTo });
+  const [state, dispatch] = useGame(D.KEY, reducerFor(D), fresh, { paused: howTo, day });
   const [showResults, setShowResults] = useState(false);
   const done = state.status === 'done';
   const s = SENTENCES[state.index];

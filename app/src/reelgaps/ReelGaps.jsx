@@ -56,7 +56,7 @@ export default function ReelGaps({ day, onHome }) {
   const D = dayOf(day);
   const { TITLES, theme } = D;
   const [howTo, setHowTo] = useHowTo('reelgaps');
-  const [state, dispatch] = useGame(D.KEY, reducerFor(D), fresh, { paused: howTo });
+  const [state, dispatch] = useGame(D.KEY, reducerFor(D), fresh, { paused: howTo, day });
   const [showResults, setShowResults] = useState(false);
   const [flash, setFlash] = useState(false);
   const done = state.status === 'done';

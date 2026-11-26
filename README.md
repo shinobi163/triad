@@ -29,11 +29,12 @@ npm run dev
 Open http://localhost:5173. Each game also has its own address (`#rungs`, `#lockpick`, …).
 
 - **Daily puzzles.** Wits #1 is 26 November 2026; each local midnight is the next number (`app/src/daily.js`). The opening screen shows **#N**, and **‹ ›** step back through earlier days (never ahead of today). In development, `?day=N` opens any day: http://localhost:5173/?day=5
-- Every game opens on a How-to screen (three lines, one example, **Play**) the first time each visit; **?** brings it back.
+- Every game opens on a How-to screen (three lines, one example, **Play**) the first time you open it; **?** brings it back.
 - **‹ Games** (top left) and **‹ Back to all games** (on every results card) return to the list at any time; the browser Back button works too. Leaving keeps the game as it was.
 - Every game has **Give up** (tap twice), which ends the game and shows the answer.
-- The list shows a ✓ line only for puzzles finished this visit.
-- Nothing is saved between visits: progress lives in memory (`app/src/session.js`).
+- The list shows a ✓ line for each of the day's puzzles you have finished.
+- **Streaks.** A day counts when you finish (or give up on) any of that day's games on the day itself; playing an earlier day with ‹ doesn't count. The opening screen shows the current streak and your best (`app/src/streak.js`). The streak stays alive until midnight, with a nudge to play today.
+- **Saving.** Every game, the How-to screens and the streak are saved in this browser (localStorage, `app/src/session.js`), so a reload or a later visit resumes where you were. Game states older than 60 days are tidied away. Nothing leaves the device; private windows and blocked storage just play without saving.
 
 ## Daily puzzles
 
@@ -76,4 +77,4 @@ npm run words    # rebuilds words/words.json after editing the word lists
 - `words/popular.txt`: the ENABLE words that also appear in TV/film subtitle frequency lists ([dolph/dictionary](https://github.com/dolph/dictionary)). Answers, secrets and shown routes come only from these. Check its licence before a public launch.
 - `words/blocklist.txt`: words never used as an answer or shown in a route.
 
-Not built yet: sound, saving between visits, streaks.
+Not built yet: sound, syncing progress between devices.

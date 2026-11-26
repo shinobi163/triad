@@ -130,7 +130,7 @@ export default function Relay({ day, onHome }) {
   const { cat, thing, name } = R;
   const SHOWN = cat.shown;
   const [howTo, setHowTo] = useHowTo('relay');
-  const [state, dispatch] = useGame(R.KEY, reducerFor(R), freshFor(R), { paused: howTo });
+  const [state, dispatch] = useGame(R.KEY, reducerFor(R), freshFor(R), { paused: howTo, day });
   const [showResults, setShowResults] = useState(false);
   const done = state.status === 'done';
   const prev = last(state.chain);

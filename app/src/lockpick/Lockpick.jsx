@@ -147,7 +147,7 @@ export default function Lockpick({ day, onHome }) {
 }
 
 function Board({ day, p, howTo, setHowTo, onHome, children }) {
-  const [state, dispatch] = useGame(p.key, reducerFor(p), fresh, { paused: howTo });
+  const [state, dispatch] = useGame(p.key, reducerFor(p), fresh, { paused: howTo, day });
   const [showResults, setShowResults] = useState(false);
   const done = state.status === 'done';
 

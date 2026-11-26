@@ -88,7 +88,7 @@ export default function Poise({ day, onHome }) {
   const L = levelFor(day);
   const { puzzle, SLOTS, SIDE, WORDS, PAR, KEY } = L;
   const [howTo, setHowTo] = useHowTo('poise');
-  const [state, dispatch] = useGame(KEY, reducerFor(L), freshFor(L), { paused: howTo });
+  const [state, dispatch] = useGame(KEY, reducerFor(L), freshFor(L), { paused: howTo, day });
   const [selected, setSelected] = useState(null);   // { word } or { slot }
   const [showResults, setShowResults] = useState(false);
   const done = state.status === 'done';
